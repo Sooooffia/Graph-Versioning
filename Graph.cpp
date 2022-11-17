@@ -63,12 +63,20 @@ int IntGraph::size() const {
     return n;
 }
 
-unordered_set<int> IntGraph::in_neighbors(int) {
-    return unordered_set<int>();
+vector<int> IntGraph::in_neighbors(int v) {
+    vector<int> output;
+    for (auto u: inNeighbors[v]){
+        output.push_back(u.first);
+    }
+    return output;
 }
 
-unordered_set<int> IntGraph::out_neighbors(int) {
-    return unordered_set<int>();
+vector<int> IntGraph::out_neighbors(int v) {
+    vector<int> output;
+    for (auto u: outNeighbors[v]){
+        output.push_back(u.first);
+    }
+    return output;
 }
 
 

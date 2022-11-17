@@ -49,8 +49,8 @@ public:
     /// List of all edges
 
     /// Access neighbors
-    unordered_set<int> in_neighbors(int);
-    unordered_set<int> out_neighbors(int);
+    vector<int> in_neighbors(int);
+    vector<int> out_neighbors(int);
 
     // Modifiers //
     /**
