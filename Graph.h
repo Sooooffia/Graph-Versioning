@@ -16,8 +16,8 @@ using namespace std;
 
 //template <typename T>
 struct edge_variables{
-    int storage;
-    int retrieval;
+    int storage = 0;
+    int retrieval = 0;
 };
 
 class IntGraph {
@@ -35,6 +35,7 @@ public:
     IntGraph() = default;
     /// @param node_count: number of nodes in the new empty graph.
     explicit IntGraph(int node_count);
+    // TODO: add constructor that constructs the graph from lists of nodes and edges.
 
     // Accessors //
     /// Number of nodes in graph
@@ -46,7 +47,6 @@ public:
     /// Access out-edge
     unordered_map<int, edge_variables> out_edges(int);
     /// List of all edges
-//    unordered_set<pair>
 
     /// Access neighbors
     unordered_set<int> in_neighbors(int);
@@ -60,12 +60,24 @@ public:
      */
     int add_node(int node_count = 1);
     /**
-     * @param u
-     * @param v
-     * Adds directed (u,v) to graph. Throw exception if adds repeated edge or self-loop.
+     * @param node_count: the node to delete.
      */
-    void add_edge(int u, int v);
     void delete_node(int node);
+
+    /**
+     * @param u pred
+     * @param v succ
+     * @param costs costs assigned to this directed edge
+     * Adds directed (u,v) to graph. Throw exception if adds repeated edge or self-loop.
+     * Costs are 0 by default.
+     */
+    void add_or_modify_edge(int u, int v, edge_variables costs = {0,0});
+
+    /**
+     * @param u pred
+     * @param v succ
+     * Deletes specified edge
+     */
     void delete_edge(int u, int v);
 };
 
