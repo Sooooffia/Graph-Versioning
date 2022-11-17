@@ -23,42 +23,65 @@ struct edge_variables{
 class IntGraph {
 private:
     // Variables //
-    int n = 0, m = 0;
+    /**
+     * n := number of nodes ** not counting the auxiliary root **
+     * m := number of edges ** not counting edges from the auxiliary root **
+     */
+    int n = 0;
     unordered_set<int> nodes;
-    // we will have a set of predecessors and successors instead of edges.
+    /**
+     * we will have a set of predecessors and successors instead of edges.
+     */
     unordered_map<int, unordered_map<int, edge_variables>> inNeighbors;
     unordered_map<int, unordered_map<int, edge_variables>> outNeighbors;
 
+    /**
+     * Helper function that takes a node and makes it
+     */
+    void make_node(int v);
+    void make_edge(int u, int v, edge_variables costs);
+
 public:
     // Constructors //
-    /// @param
-    IntGraph() = default;
-    /// @param node_count: number of nodes in the new empty graph.
+    IntGraph();
+    /**
+     * @param node_count: number of nodes in the new empty graph.
+     * all nodes storage cost initialized as 0.
+     */
     explicit IntGraph(int node_count);
-    // TODO: add constructor that constructs the graph from lists of nodes and edges.
+    /**
+     * @param nodes: a list of nodes in a vector.
+     * @param edges: a list of edges in tuple: predecessor, successor, weight struct.
+     * construct an intGraph from lists of nodes and edges
+     */
+    IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges);
 
     // Accessors //
     /// Number of nodes in graph
-    int size() const;
-    /// Number of edges in graph
-    int edge_size() const;
+    int get_nodes_size() const;
+    /// List of all nodes
+    unordered_set<int> get_nodes();
     /// Access in-edge
-    unordered_map<int, edge_variables> in_edges(int);
+    unordered_map<int, edge_variables> get_in_edges_of(int);
     /// Access out-edge
-    unordered_map<int, edge_variables> out_edges(int);
+    unordered_map<int, edge_variables> get_out_edges_of(int);
     /// List of all edges
-
+    vector<tuple<int,int,edge_variables>> get_edges();
     /// Access neighbors
-    vector<int> in_neighbors(int);
-    vector<int> out_neighbors(int);
+    vector<int> get_in_neighbors_of(int);
+    vector<int> get_out_neighbors_of(int);
 
     // Modifiers //
     /**
      * @param node_count: number of nodes to add.
-     * @return last added node.
-     * Automatically choose
+     * @return a list of added nodes.
+     * Automatically choose node names to add; storage cost set to 0 as default.
      */
-    int add_node(int node_count = 1);
+    vector<int> add_node(int node_count = 1);
+    /**
+     * @param
+     */
+    vector<int> add_note_with_storage(vector<tuple<int,int>>);
     /**
      * @param node_count: the node to delete.
      */
