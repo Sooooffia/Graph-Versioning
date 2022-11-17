@@ -8,9 +8,20 @@ IntGraph::IntGraph(int node_number) {
     n = node_number;
 }
 
-// TODO: need to figure out how we want to add nodes
+// TODO: modify to add the consideration of auxiliary root.
+
+
 int IntGraph::add_node(int node_count) {
-    return 0;
+    int i = 1;
+    while (node_count != 0){
+        if (nodes.find(i) == nodes.end()){
+            nodes.insert(i);
+            n ++;
+            node_count --;
+            i++;
+        }
+    }
+    return n;
 }
 
 void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs) {
