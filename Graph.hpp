@@ -62,6 +62,7 @@ public:
      * @param equal_weights: bool, whether the two costs are equal.
      * @Detail Directed. Both costs of the edge are the same integer random variable from Unif[1,100].
      */
+     // TODO: add a string indicator for different types of graphs
      IntGraph(int node_count, int p, bool equal_weights = true);
 
     // Accessors //
@@ -107,11 +108,7 @@ public:
     void delete_edge(int u, int v);
 };
 
-/**
- * @param v_size
- * @param e_size
- * @return a random graph
- */
+
 
 
 #endif //DATA_VERSIONING_C_GRAPH_H
