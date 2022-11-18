@@ -58,8 +58,12 @@ unordered_set<int> IntGraph::get_nodes(bool aux) const {
         return ans;
     }
 }
-unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v) const {
-    return inNeighbors.at(v);
+unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v,bool aux) const {
+    unordered_map<int, edge_variables> output = inNeighbors.at(v);
+    if (!aux){
+        output.erase(0);
+    }
+    return output;
 }
 unordered_map<int, edge_variables> IntGraph::get_out_edges_of(int v) const {
     return outNeighbors.at(v);
@@ -80,11 +84,13 @@ vector<tuple<int, int, edge_variables>> IntGraph::get_edges(bool aux) const {
 int IntGraph::size() const {
     return n;
 }
-vector<int> IntGraph::get_in_neighbors_of(int v) const {
+vector<int> IntGraph::get_in_neighbors_of(int v, bool aux) const {
     vector<int> output;
     output.reserve(inNeighbors.at(v).size());
     for (const auto &u: inNeighbors.at(v)){
-        output.push_back(u.first);
+        if(aux || u.first != 0){
+            output.push_back(u.first);
+        }
     }
     return output;
 }
