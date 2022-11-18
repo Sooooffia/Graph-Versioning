@@ -137,7 +137,6 @@ void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs) {
     make_edge(u,v,costs);
 }
 void IntGraph::delete_edge(int u, int v) {
-    // TODO: new way of writing conditions
     auto cond1 = nodes.find(v) != nodes.end() && inNeighbors[v].find(u) != inNeighbors[v].end();
     auto cond2 = nodes.find(u) != nodes.end() && outNeighbors[u].find(v) != outNeighbors[u].end();
     if (cond1 != cond2) {
@@ -148,7 +147,6 @@ void IntGraph::delete_edge(int u, int v) {
     }
 }
 void IntGraph::delete_node(int v) {
-    // TODO: new for loops
     if (nodes.find(v) == nodes.end()) {
         throw invalid_argument("Nodes cannot be found in delete_node.");
     }
