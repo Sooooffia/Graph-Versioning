@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.23)
-project(data_versioning_c)
+project(Graph-Versioning)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
-add_executable(data_versioning_c main.cpp Graph.cpp Graph.h)
+add_executable(Graph-Versioning main.cpp Graph.cpp)

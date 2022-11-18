@@ -8,7 +8,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: data_versioning_c
+# Project: Graph-Versioning
 # Configurations: Debug
 # =============================================================================
 
@@ -36,50 +36,50 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /Users/lijingwei/CLionProjects/Graph-Versioning/cmake-build-debug/
+cmake_ninja_workdir = /Users/lollipop/Desktop/Graph-Versioning/cmake-build-debug/
 # =============================================================================
-# Object build statements for EXECUTABLE target data_versioning_c
+# Object build statements for EXECUTABLE target Graph-Versioning
 
 
 #############################################
-# Order-only phony target for data_versioning_c
+# Order-only phony target for Graph-Versioning
 
-build cmake_object_order_depends_target_data_versioning_c: phony || CMakeFiles/data_versioning_c.dir
+build cmake_object_order_depends_target_Graph-Versioning: phony || CMakeFiles/Graph-Versioning.dir
 
-build CMakeFiles/data_versioning_c.dir/main.cpp.o: CXX_COMPILER__data_versioning_c_Debug /Users/lijingwei/CLionProjects/Graph-Versioning/main.cpp || cmake_object_order_depends_target_data_versioning_c
-  DEP_FILE = CMakeFiles/data_versioning_c.dir/main.cpp.o.d
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk -std=gnu++17
-  OBJECT_DIR = CMakeFiles/data_versioning_c.dir
-  OBJECT_FILE_DIR = CMakeFiles/data_versioning_c.dir
+build CMakeFiles/Graph-Versioning.dir/main.cpp.o: CXX_COMPILER__Graph-Versioning_Debug /Users/lollipop/Desktop/Graph-Versioning/main.cpp || cmake_object_order_depends_target_Graph-Versioning
+  DEP_FILE = CMakeFiles/Graph-Versioning.dir/main.cpp.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk -std=gnu++20
+  OBJECT_DIR = CMakeFiles/Graph-Versioning.dir
+  OBJECT_FILE_DIR = CMakeFiles/Graph-Versioning.dir
 
-build CMakeFiles/data_versioning_c.dir/Graph.cpp.o: CXX_COMPILER__data_versioning_c_Debug /Users/lijingwei/CLionProjects/Graph-Versioning/Graph.cpp || cmake_object_order_depends_target_data_versioning_c
-  DEP_FILE = CMakeFiles/data_versioning_c.dir/Graph.cpp.o.d
-  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk -std=gnu++17
-  OBJECT_DIR = CMakeFiles/data_versioning_c.dir
-  OBJECT_FILE_DIR = CMakeFiles/data_versioning_c.dir
+build CMakeFiles/Graph-Versioning.dir/Graph.cpp.o: CXX_COMPILER__Graph-Versioning_Debug /Users/lollipop/Desktop/Graph-Versioning/Graph.cpp || cmake_object_order_depends_target_Graph-Versioning
+  DEP_FILE = CMakeFiles/Graph-Versioning.dir/Graph.cpp.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk -std=gnu++20
+  OBJECT_DIR = CMakeFiles/Graph-Versioning.dir
+  OBJECT_FILE_DIR = CMakeFiles/Graph-Versioning.dir
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target data_versioning_c
+# Link build statements for EXECUTABLE target Graph-Versioning
 
 
 #############################################
-# Link the executable data_versioning_c
+# Link the executable Graph-Versioning
 
-build data_versioning_c: CXX_EXECUTABLE_LINKER__data_versioning_c_Debug CMakeFiles/data_versioning_c.dir/main.cpp.o CMakeFiles/data_versioning_c.dir/Graph.cpp.o
+build Graph-Versioning: CXX_EXECUTABLE_LINKER__Graph-Versioning_Debug CMakeFiles/Graph-Versioning.dir/main.cpp.o CMakeFiles/Graph-Versioning.dir/Graph.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk
-  OBJECT_DIR = CMakeFiles/data_versioning_c.dir
+  OBJECT_DIR = CMakeFiles/Graph-Versioning.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_FILE = data_versioning_c
-  TARGET_PDB = data_versioning_c.dbg
+  TARGET_FILE = Graph-Versioning
+  TARGET_PDB = Graph-Versioning.dbg
 
 
 #############################################
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/lijingwei/CLionProjects/Graph-Versioning/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  COMMAND = cd /Users/lollipop/Desktop/Graph-Versioning/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
   DESC = No interactive CMake dialog available...
   restat = 1
 
@@ -90,7 +90,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/lijingwei/CLionProjects/Graph-Versioning/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/lijingwei/CLionProjects/Graph-Versioning -B/Users/lijingwei/CLionProjects/Graph-Versioning/cmake-build-debug
+  COMMAND = cd /Users/lollipop/Desktop/Graph-Versioning/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/lollipop/Desktop/Graph-Versioning -B/Users/lollipop/Desktop/Graph-Versioning/cmake-build-debug
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -106,9 +106,9 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 #############################################
-# Folder: /Users/lijingwei/CLionProjects/Graph-Versioning/cmake-build-debug
+# Folder: /Users/lollipop/Desktop/Graph-Versioning/cmake-build-debug
 
-build all: phony data_versioning_c
+build all: phony Graph-Versioning
 
 # =============================================================================
 # Built-in targets
