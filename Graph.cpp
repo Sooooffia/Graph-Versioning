@@ -21,7 +21,6 @@ void IntGraph::make_edge(int u, int v, const edge_variables& costs){
 }
 
 // Constructors //
-
 IntGraph::IntGraph() { make_node(0); }
 IntGraph::IntGraph(int node_number) {
     make_node(0);
@@ -60,7 +59,6 @@ IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
             make_edge(u, v, { rand() % 100 + 1,  rand() % 100 + 1});
         }
     };
-
     make_node(0);
     while (n < node_count) {
         n++;
