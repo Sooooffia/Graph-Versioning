@@ -1,6 +1,48 @@
 #include "Graph.hpp"
-
+#include <iostream>
 #define CHECK(x) { if (!(x)) std::cout << __FUNCTION__ << " failed on line " << __LINE__ << std::endl; }
+using std::ostream;
+using std::cout;
+
+// Outputting a vector like python list
+template <typename T>
+ostream& operator<<(ostream& os, const vector<T>& V)
+{
+    os << '[';
+    for (auto it = V.begin(); it != V.end(); ) {
+        os << *it;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "]" << std::endl;
+    return os;
+}
+// Outputting an unordered set like python set
+template <typename T>
+ostream& operator<<(ostream& os, const unordered_set<T>& V)
+{
+    os << '{';
+    for (auto it = V.begin(); it != V.end();) {
+        os << *it;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "}" << std::endl;
+    return os;
+}
+// Outputting an unordered set like python dict
+template <typename S, typename T>
+ostream& operator<<(ostream& os, const unordered_map<S, T>& V)
+{
+    os << '{';
+    for (auto it = V.begin(); it != V.end();) {
+        os << it->first << ": " << it->second;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "}" << std::endl;
+    return os;
+}
 
 void test_graph_construction() {
     // Construction graphs and accessing nodes and edges

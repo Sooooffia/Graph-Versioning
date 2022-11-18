@@ -4,11 +4,8 @@
 using std::cout;
 
 int main() {
-//    unordered_map<int,int> M;
-//    M.insert_or_assign(0, 1);
-//    M.insert_or_assign(0, 2);
-//    M.insert_or_assign(1, 1);
-//    cout << 'aaa';
+    unordered_set<int> V{0, 1, 1};
+    cout << V;
     test_graph_construction();
     return 0;
 }

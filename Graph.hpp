@@ -41,23 +41,31 @@ private:
 
 public:
     // Constructors //
+    /// @brief Default constructor. Emtpy graph. (only auxiliary node 0.)
     IntGraph();
     /**
+     * @brief Initialize empty graph with specified node number 1-n.
      * @param node_count: number of nodes in the new empty graph.
-     * All nodes storage cost initialized as 0.
+     * @Detail All nodes storage cost initialized as 0.
      */
     explicit IntGraph(int node_count);
     /**
-     * @param nodes: a vector of nodes.
+     * @brief Initialize graph with specified nodes and edges.
+     * @param nodes: a vector of int.
      * @param edges: a vector of edges in tuple<int,int,edge_var>: predecessor, successor, weight struct.
-     * Construct an IntGraph from vectors of nodes and edges
      */
     IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges);
+    /**
+     * @brief Initialize random graph.
+     * @param node_count: int, number of nodes.
+     * @param p: (0,1), independent probability of each edge being created.
+     * @param equal_weights: bool, whether the two costs are equal.
+     * @Detail Directed. Both costs of the edge are the same integer random variable from Unif[1,100].
+     */
+     IntGraph(int node_count, int p, bool equal_weights = true);
 
     // Accessors //
-    // TODO: const
     [[nodiscard]] int size() const;///< @return Number of nodes in graph, not counting the auxiliary root.
-    // TODO: added bool to indicate whether want auxiliary root
     [[nodiscard]] unordered_set<int> get_nodes(bool aux = false) const;///< @return A vector of all nodes.
     [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).
     [[nodiscard]] unordered_map<int, edge_variables> get_out_edges_of(int) const;///< @param u: node. @return A map v -> weight(u,v), for all existing (u,v).
@@ -104,7 +112,6 @@ public:
  * @param e_size
  * @return a random graph
  */
-IntGraph generate_random_graph(int v_size, int e_size);
 
 
 #endif //DATA_VERSIONING_C_GRAPH_H

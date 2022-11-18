@@ -12,7 +12,6 @@ void IntGraph::make_node(int v){
     outNeighbors.insert({v,unordered_map<int,edge_variables>()});
 }
 void IntGraph::make_edge(int u, int v, const edge_variables& costs){
-    // TODO: operator[], and .at(v)
     inNeighbors[v][u] = costs;
     outNeighbors[u][v] = costs;
 }
@@ -137,7 +136,6 @@ void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs) {
     make_edge(u,v,costs);
 }
 void IntGraph::delete_edge(int u, int v) {
-    // TODO: new way of writing conditions
     auto cond1 = nodes.find(v) != nodes.end() && inNeighbors[v].find(u) != inNeighbors[v].end();
     auto cond2 = nodes.find(u) != nodes.end() && outNeighbors[u].find(v) != outNeighbors[u].end();
     if (cond1 != cond2) {
@@ -148,7 +146,6 @@ void IntGraph::delete_edge(int u, int v) {
     }
 }
 void IntGraph::delete_node(int v) {
-    // TODO: new for loops
     if (nodes.find(v) == nodes.end()) {
         throw invalid_argument("Nodes cannot be found in delete_node.");
     }
@@ -162,10 +159,29 @@ void IntGraph::delete_node(int v) {
     n --;
 }
 
+IntGraph::IntGraph(int node_count, int p, bool equal_weights) {
+    // lambda
+    auto make_random_edge = [equal_weights, this](int u, int v) {
+        if (equal_weights) {
+            int weight = rand() % 100 + 1;
+            make_edge(u, v, {weight, weight});
+        } else {
+            make_edge(u, v, { rand() % 100 + 1,  rand() % 100 + 1});
+        }
+    };
 
-
-IntGraph generate_random_graph(int v_size, int e_size) {
-    IntGraph G(1);
-    // TODO: generate random graphs
-    return G;
+    make_node(0);
+    while (n < node_count) {
+        n++;
+        make_node(n);
+        make_edge(0,n,{rand() % 100 + 1,0});
+    }
+    for (int i = 1; i < n; i ++) {
+        for (int j = i+1; j <= n; j++) {
+            if (rand() < p * RAND_MAX)
+                make_random_edge(i, j);
+            if (rand() < p * RAND_MAX)
+                make_random_edge(j, i);
+        }
+    }
 }
