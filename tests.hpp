@@ -43,6 +43,30 @@ ostream& operator<<(ostream& os, const unordered_map<S, T>& V)
     os << "}" << std::endl;
     return os;
 }
+// Outputting a tuple like python tuple
+template<class Tuple, size_t N>
+struct TuplePrinter {
+    static void print(ostream& os, const Tuple& t)
+    {
+        TuplePrinter<Tuple, N-1>::print(os, t);
+        os << ", " << get<N-1>(t);
+    }
+};
+template<class Tuple>
+struct TuplePrinter<Tuple, 1> {
+    static void print(ostream& os, const Tuple& t)
+    {
+        os << get<0>(t);
+    }
+};
+template<class... Args>
+ostream& operator<<(ostream& os, const std::tuple<Args...>& t)
+{
+    os << "(";
+    TuplePrinter<decltype(t), sizeof...(Args)>::print(os, t);
+    os << ")";
+    return os;
+}
 
 void test_graph_construction() {
     // Construction graphs and accessing nodes and edges
@@ -52,8 +76,16 @@ void test_graph_construction() {
     CHECK(G.get_out_neighbors_of(1).empty())
     CHECK(G.get_out_neighbors_of(0).size() == 10)
     CHECK(G.get_in_neighbors_of(0).empty())
-    vector<int> node_vector{1, 2, 3, 4, 5};
-    // TODO: add list of edges
+
+    vector<tuple<int, int>> node_vector{{1,100}, {2,110}, {3,120}, {4,80}, {5,50}};
+    IntGraph::edge_vec edge_vector{{1, 2, {10, 20}}
+                                , {2, 3, {20, 10}}
+                                , {4, 5, {40, 40}}};
+    IntGraph G_prime(node_vector, edge_vector);
+    cout << G_prime.get_edges();
+
+    IntGraph G_rand(10, 0.5);
+    cout << G_rand.get_edges();
 
     // Adding and deleting nodes
     auto v = G.add_node(1);
@@ -82,6 +114,7 @@ void test_graph_construction() {
     CHECK(G.get_in_edges_of(3).size() == 1)
 
     // get nodes and get edges
+
 }
 
 

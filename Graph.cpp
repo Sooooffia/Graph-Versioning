@@ -4,6 +4,10 @@
 
 #include "Graph.hpp"
 
+ostream& operator<<(ostream& os, const edge_variables& w) {
+    os << "(s=" << w.storage << ", r=" << w.retrieval << ")";
+    return os;
+}
 
 // Helper functions //
 void IntGraph::make_node(int v){
@@ -16,10 +20,9 @@ void IntGraph::make_edge(int u, int v, const edge_variables& costs){
     outNeighbors[u][v] = costs;
 }
 
-// Constructors
+// Constructors //
 
 IntGraph::IntGraph() { make_node(0); }
-
 IntGraph::IntGraph(int node_number) {
     make_node(0);
     while (n < node_number) {
@@ -44,7 +47,33 @@ IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<in
         if (pred == 0 || succ == 0){
             throw invalid_argument("Invalid initialization: auxiliary root involved in edges.");
         }
-        make_edge(pred,succ,costs);
+        make_edge(pred, succ, costs);
+    }
+}
+IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
+    // lambda
+    auto make_random_edge = [equal_weights, this](int u, int v) {
+        if (equal_weights) {
+            int weight = rand() % 100 + 1;
+            make_edge(u, v, {weight, weight});
+        } else {
+            make_edge(u, v, { rand() % 100 + 1,  rand() % 100 + 1});
+        }
+    };
+
+    make_node(0);
+    while (n < node_count) {
+        n++;
+        make_node(n);
+        make_edge(0,n,{rand() % 100 + 1,0});
+    }
+    for (int i = 1; i < n; i ++) {
+        for (int j = i+1; j <= n; j++) {
+            if (rand() < p * RAND_MAX)
+                make_random_edge(i, j);
+            if (rand() < p * RAND_MAX)
+                make_random_edge(j, i);
+        }
     }
 }
 
@@ -165,29 +194,3 @@ void IntGraph::delete_node(int v) {
     n --;
 }
 
-IntGraph::IntGraph(int node_count, int p, bool equal_weights) {
-    // lambda
-    auto make_random_edge = [equal_weights, this](int u, int v) {
-        if (equal_weights) {
-            int weight = rand() % 100 + 1;
-            make_edge(u, v, {weight, weight});
-        } else {
-            make_edge(u, v, { rand() % 100 + 1,  rand() % 100 + 1});
-        }
-    };
-
-    make_node(0);
-    while (n < node_count) {
-        n++;
-        make_node(n);
-        make_edge(0,n,{rand() % 100 + 1,0});
-    }
-    for (int i = 1; i < n; i ++) {
-        for (int j = i+1; j <= n; j++) {
-            if (rand() < p * RAND_MAX)
-                make_random_edge(i, j);
-            if (rand() < p * RAND_MAX)
-                make_random_edge(j, i);
-        }
-    }
-}

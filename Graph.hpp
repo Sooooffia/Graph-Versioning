@@ -5,12 +5,14 @@
 #include "unordered_set"
 #include "unordered_map"
 #include "map"
+#include <iostream>
 using std::unordered_set;
 using std::unordered_map;
 using std::vector;
 using std::tuple;
 using std::invalid_argument;
 using std::logic_error;
+using std::ostream;
 
 struct edge_variables{
     int storage = 0;
@@ -20,6 +22,7 @@ struct edge_variables{
 inline bool operator==(const edge_variables& a, const edge_variables& b) {
     return a.storage == b.storage && a.retrieval == b.retrieval;
 }
+ostream& operator<<(ostream& os, const edge_variables& w);
 
 class IntGraph {
 private:
@@ -40,6 +43,7 @@ private:
     void make_edge(int u, int v, const edge_variables& costs);
 
 public:
+    using edge_vec = vector<tuple<int, int, edge_variables>>;
     // Constructors //
     /// @brief Default constructor. Emtpy graph. (only auxiliary node 0.)
     IntGraph();
@@ -62,7 +66,7 @@ public:
      * @param equal_weights: bool, whether the two costs are equal.
      * @Detail Directed. Both costs of the edge are the same integer random variable from Unif[1,100].
      */
-     IntGraph(int node_count, int p, bool equal_weights = true);
+     IntGraph(int node_count, float p, bool equal_weights = true);
 
     // Accessors //
     [[nodiscard]] int size() const;///< @return Number of nodes in graph, not counting the auxiliary root.
