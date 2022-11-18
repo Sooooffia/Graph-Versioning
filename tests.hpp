@@ -6,7 +6,7 @@ void test_graph_construction() {
     // Construction graphs and accessing nodes and edges
     IntGraph G(10);
     CHECK(G.size() == 10)
-    CHECK(G.get_in_edges_of(1).size() == 1)
+    CHECK(G.get_in_edges_of(1,1).size() == 1)
     CHECK(G.get_out_neighbors_of(1).empty())
     CHECK(G.get_out_neighbors_of(0).size() == 10)
     CHECK(G.get_in_neighbors_of(0).empty())

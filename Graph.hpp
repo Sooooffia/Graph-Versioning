@@ -55,13 +55,12 @@ public:
     IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges);
 
     // Accessors //
-    // TODO: const
     [[nodiscard]] int size() const;///< @return Number of nodes in graph, not counting the auxiliary root.
     [[nodiscard]] unordered_set<int> get_nodes(bool aux = false) const;///< @return A vector of all nodes.
-    [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).
+    [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int v, bool aux = false) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).
     [[nodiscard]] unordered_map<int, edge_variables> get_out_edges_of(int) const;///< @param u: node. @return A map v -> weight(u,v), for all existing (u,v).
     [[nodiscard]] vector<tuple<int,int,edge_variables>> get_edges(bool aux = false) const;///< @return A vector of all edges
-    [[nodiscard]] vector<int> get_in_neighbors_of(int) const;///< @return A vector of predecessors
+    [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux = false) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
 
     // Modifiers //
