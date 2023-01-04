@@ -2,5 +2,6 @@ cmake_minimum_required(VERSION 3.23)
 project(Graph-Versioning)
 
 set(CMAKE_CXX_STANDARD 20)
+add_subdirectory(MST)
+add_executable(Graph-Versioning main.cpp Graph.cpp )
 
-add_executable(Graph-Versioning main.cpp Graph.cpp)

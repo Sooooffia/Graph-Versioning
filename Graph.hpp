@@ -55,10 +55,10 @@ public:
     explicit IntGraph(int node_count);
     /**
      * @brief Initialize graph with specified nodes and edges.
-     * @param nodes: a vector of int.
+     * @param nodes: a vector of <int,int>: node, storage.
      * @param edges: a vector of edges in tuple<int,int,edge_var>: predecessor, successor, weight struct.
      */
-    IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges);
+    IntGraph(const vector<tuple<int,int>>& nodes, const vector<tuple<int, int, edge_variables>>& edges);
     /**
      * @brief Initialize random graph.
      * @param node_count: int, number of nodes.
