@@ -1,8 +1,7 @@
 #include "Graph.hpp"
 #include <iostream>
 #define CHECK(x) { if (!(x)) std::cout << __FUNCTION__ << " failed on line " << __LINE__ << std::endl; }
-using std::ostream;
-using std::cout;
+using namespace std;
 
 // Outputting a vector like python list
 template <typename T>

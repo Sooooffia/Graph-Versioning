@@ -28,6 +28,8 @@ class IntGraph {
 private:
     // Variables //
     int n = 0; ///< @brief Number of nodes (not counting the auxiliary root)
+    //TODO: add this m to every constructor and methods
+    int m = 0; ///< @brief Number of edges (not counting the auxiliary edges)
     unordered_set<int> nodes;
     /*
      * we will have a set of predecessors and successors instead of edges.
@@ -74,7 +76,7 @@ public:
     [[nodiscard]] unordered_set<int> get_nodes(bool aux = false) const;///< @return A vector of all nodes.
     [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int v, bool aux = false) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).
     [[nodiscard]] unordered_map<int, edge_variables> get_out_edges_of(int) const;///< @param u: node. @return A map v -> weight(u,v), for all existing (u,v).
-    [[nodiscard]] vector<tuple<int,int,edge_variables>> get_edges(bool aux = false) const;///< @return A vector of all edges
+    [[nodiscard]] vector<tuple<int,int,edge_variables>> get_edges(bool aux = false) const;///< @return A vector of all edges, aux: whether to include auxilary root
     [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux = false) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
 

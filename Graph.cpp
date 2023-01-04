@@ -3,6 +3,7 @@
 //
 
 #include "Graph.hpp"
+using namespace std;
 
 ostream& operator<<(ostream& os, const edge_variables& w) {
     os << "(s=" << w.storage << ", r=" << w.retrieval << ")";

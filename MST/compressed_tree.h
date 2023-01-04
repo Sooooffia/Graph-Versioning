@@ -27,4 +27,4 @@ protected:
 }  // namespace arbok
 
 
-#include <arbok/data_structures/compressed_tree.inl>
+#include "compressed_tree.inl"
