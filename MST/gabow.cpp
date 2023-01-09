@@ -5,6 +5,7 @@
 #include <cassert>
 
 using namespace arbok;
+using namespace std;
 
 Gabow::Gabow(int n, int /* m */)
     : num_vertices(n)
