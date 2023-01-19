@@ -1,7 +1,8 @@
+#ifndef GABOW_H
+#define GABOW_H
 
 #include <vector>
 #include <list>
-
 #include "active_forest.h"
 
 namespace arbok {
@@ -46,3 +47,5 @@ namespace arbok {
     };
 
 } // end namespace arbok
+
+#endif

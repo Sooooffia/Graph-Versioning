@@ -34,6 +34,8 @@ IntGraph::IntGraph(int node_number) {
 IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges) {
     make_node(0);
     for (auto v : vertices){
+        if (get<0>(v) == 0)
+            throw invalid_argument("IntGraph initialization: auxiliary root involved in nodes.");
         int& vertex = get<0>(v);
         int& storage =  get<1>(v);
         make_node(vertex);
@@ -45,8 +47,20 @@ IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<in
         int& succ = get<1>(e);
         auto& costs = get<2>(e);
         if (pred == 0 || succ == 0){
-            throw invalid_argument("Invalid initialization: auxiliary root involved in edges.");
+            throw invalid_argument("IntGraph initialization: auxiliary root involved in edges.");
         }
+        make_edge(pred, succ, costs);
+    }
+}
+IntGraph::IntGraph(const vector<tuple<int, int, edge_variables>>& edges) {
+    for (auto e : edges) {
+        int& pred = get<0>(e);
+        int& succ = get<1>(e);
+        auto& costs = get<2>(e);
+        if (nodes.find(pred) == nodes.end())
+            make_node(pred);
+        if (nodes.find(succ) == nodes.end())
+            make_node(succ);
         make_edge(pred, succ, costs);
     }
 }
@@ -66,6 +80,7 @@ IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
         make_node(n);
         make_edge(0,n,{rand() % 100 + 1,0});
     }
+    // TODO: seed? This random produces the same results each time.
     for (int i = 1; i < n; i ++) {
         for (int j = i+1; j <= n; j++) {
             if (rand() < p * RAND_MAX)
@@ -86,6 +101,21 @@ unordered_set<int> IntGraph::get_nodes(bool aux) const {
         return ans;
     }
 }
+vector<tuple<int, int>> IntGraph::get_nodes_and_storage(bool aux) const {
+    vector<tuple<int, int>> ans;
+    if (aux) {
+        ans.emplace_back(0,0);
+    }
+    for (int v : nodes) {
+        if (v == 0) {
+            ans.emplace_back(0, 0);
+        } else {
+            ans.emplace_back(v, outNeighbors.at(0).at(v).storage);
+        }
+    }
+    return ans;
+}
+
 unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v,bool aux) const {
     unordered_map<int, edge_variables> output = inNeighbors.at(v);
     if (!aux){
@@ -192,4 +222,34 @@ void IntGraph::delete_node(int v) {
     nodes.erase(v);
     n --;
 }
+unordered_map<int, edge_variables> IntGraph::operator[](int u) const {
+    return get_out_edges_of(u);
+}
+int IntGraph::get_total_storage_cost() {
+    int ans = 0;
+    auto edges = get_edges(true);
+    for (auto e : edges) {
+        ans += get<2>(e).storage;
+    }
+    return ans;
+}
+IntGraph MST(const IntGraph& G) {
+    auto edges = G.get_edges(true);
+    auto nodes = G.get_nodes_and_storage(true);
+    auto m = edges.size();
 
+    /// Calculating MST the fast way
+    arbok::Gabow alg(5, m);
+    for (const auto& e:edges){
+        int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
+        alg.create_edge(u,v,w);
+    }
+    int root = 0;
+    alg.run(root);
+    auto edge_indices = alg.reconstruct(root);
+    vector<tuple<int, int, edge_variables>> MST_edges;
+    for (auto ind : edge_indices) {
+        MST_edges.push_back(edges[ind]);
+    }
+    return IntGraph(MST_edges);
+}
