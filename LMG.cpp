@@ -96,13 +96,17 @@ IntGraph LMG(const IntGraph& G, int S) {
 
         // 4. Update the graph and active nodes
         int pred = H.get_in_neighbors_of(candidate, true)[0];
+        storage_surplus -= G[0][candidate].storage - G[pred][candidate].storage;
         H.delete_edge(pred, candidate);
         H.add_or_modify_edge(0, candidate, G[0][candidate]);
         active_nodes.erase(candidate);
-        for (auto v : H.get_nodes(false))
-            if (G[0][v].storage > storage_surplus) {
+        for (auto v : H.get_nodes(false)) {
+            if (active_nodes.find(v) == active_nodes.end())
+                continue;
+            if (G[0][v].storage - H[pred][v].storage > storage_surplus) {
                 active_nodes.erase(v);
             }
+        }
     }
     return H;
 }
@@ -150,13 +154,12 @@ IntGraph LMG_all(const IntGraph& G, int S) {
     unordered_map<int, int> retrieval_cost;
     initialize_variables_LMG_all(H, dependency_set, retrieval_cost);
 
-    // TODO: change this
     unordered_set<int> active_edges; // The set of nodes that are not materialized, and that our budget allows for materialization.
     auto edges = G.get_edges(true);
     for (auto i = 0; i < edges.size(); i++) {
-        auto &v = get<1>(edges[i]);
-        auto pred_w = H[H.get_in_neighbors_of(v, true)[0]][v];
-        if (G[0][v].storage - pred_w.storage <= storage_surplus) {
+        auto &[u, v, w] = edges[i];
+        auto pred = H.get_in_neighbors_of(v, true)[0];
+        if (pred != u and w.storage - H[pred][v].storage <= storage_surplus) {
             active_edges.insert(i);
         }
     }
@@ -168,13 +171,14 @@ IntGraph LMG_all(const IntGraph& G, int S) {
         for (auto i : active_edges) {
             auto &[u, v, w] = edges[i];
             auto pred = H.get_in_neighbors_of(v, true)[0];
-            // The storage budget SHOULD allow for materializing v.
-            if (dependency_set[v].find(u) != dependency_set[v].end()) { // if u is dependent on v, meaning (u,v) forms a cycle
-                rho[v] = -1;
+            int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
+            // The storage budget SHOULD allow for adding (u,v).
+            if (retrieval_reduction <= 0 or dependency_set[v].find(u) != dependency_set[v].end() ) { // if (u,v) forms a cycle or retrieval does not decrease
+                rho[i] = -1;
             } else if (G[0][v].storage <= G[pred][v].storage) {
-                rho[v] = INFINITY;
+                rho[i] = INFINITY;
             } else {
-                rho[v] = (double) dependency_set[v].size() * (retrieval_cost[v] - (retrieval_cost[u] + w.retrieval))
+                rho[i] = (double) dependency_set[v].size() * retrieval_reduction
                          / (G[0][v].storage - G[pred][v].storage);
             }
         }
@@ -187,8 +191,8 @@ IntGraph LMG_all(const IntGraph& G, int S) {
         // 2. Modify dependency
         const auto &dependency_reduction = dependency_set[v];
         int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
-        if (retrieval_reduction < 0) {
-            throw logic_error("Unwise step");
+        if (retrieval_reduction <= 0) { // No possible improvements
+            break;
         }
 
         int cur = H.get_in_neighbors_of(v, true)[0];
@@ -210,13 +214,16 @@ IntGraph LMG_all(const IntGraph& G, int S) {
 
         // 4. Update the graph and active nodes
         int pred = H.get_in_neighbors_of(v, true)[0];
+        storage_surplus -= w.storage - H[pred][v].storage;
         H.delete_edge(pred, v);
         H.add_or_modify_edge(u, v, w);
         active_edges.erase(iter->first);
-        for (auto i =0; i < edges.size(); i++) {
-            auto &v = get<1>(edges[i]);
-            auto pred_w = H[H.get_in_neighbors_of(v, true)[0]][v];
-            if (G[0][v].storage - pred_w.storage <= storage_surplus) {
+        for (auto i = 0; i < edges.size(); i++) {
+            if (active_edges.find(i) == active_edges.end())
+                continue;
+            auto &[u, v, w] = edges[i];
+            auto pred = H.get_in_neighbors_of(v, true)[0];
+            if (w.storage - H[pred][v].storage > storage_surplus) {
                 active_edges.erase(i);
             }
         }

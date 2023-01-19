@@ -6,7 +6,7 @@ using std::cout;
 
 int main() {
 
-    test_LMG_all();
+    test_LMG();
 
     return 0;
 }
