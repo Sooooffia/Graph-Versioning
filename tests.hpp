@@ -146,11 +146,49 @@ void test_LMG() {
         std::cout << u << ' ' << v << ' ' << w << '\n';
     }
 
-    auto H4 = LMG(G, 133); // should be enough to replace (3,4) with materialization of 4. However,
-    // should still be the same as H3 due to the calculation of rho.
+    auto H4 = LMG(G, 133); // should be enough to replace (3,4) with materialization of 4
     cout << "H4's edges: \n";
     for(auto [u,v,w] : H4.get_edges(true)){
         std::cout << u << ' ' << v << ' ' << w << '\n';
     }
 }
 
+void test_LMG_all() {
+    IntGraph G({{4, 79}, {3, 24}, {2, 50}, {1, 8}},
+               {{2,1,{45, 45}}, {3,4,{41,41}}
+                       , {3,2,{22,22}}, {4,3,{4,4}}, {4,1,{66,66}}});
+    cout << "G's edges: \n";
+    for(auto [u,v,w] : G.get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+
+    cout << "MST's edges: \n";
+    for(auto [u,v,w] : MST(G).get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+
+    auto H1 = LMG_all(G, 161); // should be enough to materialize all
+    cout << "H1's edges: \n";
+    for(auto [u,v,w] : H1.get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+
+    auto H2 = LMG_all(G, 95); // should be just enough for MST
+    cout << "H2's edges: \n";
+    for(auto [u,v,w] : H2.get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+
+    auto H3 = LMG_all(G, 123); // should be enough to replace (3,2) with materialization of 2
+    cout << "H3's edges: \n";
+    for(auto [u,v,w] : H3.get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+
+    // TODO: bugs!
+    auto H4 = LMG_all(G, 133); // should be enough to replace (3,4) with materialization of 4
+    cout << "H4's edges: \n";
+    for(auto [u,v,w] : H4.get_edges(true)){
+        std::cout << u << ' ' << v << ' ' << w << '\n';
+    }
+}
