@@ -87,7 +87,7 @@ public:
 
 
     // Accessors //
-    [[nodiscard]] int size() const;///< @return Number of nodes in graph, not counting the auxiliary root.
+    [[nodiscard]] int size(bool aux) const;///< @return Number of nodes in graph.
     [[nodiscard]] unordered_set<int> get_nodes(bool aux) const;///< @return A vector of all nodes. aux=true if wants 0.
     [[nodiscard]] vector<tuple<int, int>> get_nodes_and_storage(bool aux) const;///< @return a vector of tuple<int, int>, node number and storage cost.
     [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int v, bool aux) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).

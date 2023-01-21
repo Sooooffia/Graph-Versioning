@@ -1,6 +1,7 @@
 #include "LMG.h"
 using std::map;
 using std::pair;
+using std::cout;
 
 /// Initialization helper: calculating dependency and retrieval for the first time.
 void initialize_variables_LMG(IntGraph& H, unordered_map<int, int>& dependency_count,
@@ -56,6 +57,7 @@ IntGraph LMG(const IntGraph& G, int S) {
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_nodes.empty()) {
+        cout << active_nodes.size() << "nodes left\n";
         // 1. Calculate rho for all active nodes and find maximum
         map<int, double> rho; // For each v, rho[v] is the value over cost of materializing v.
         for (auto v : active_nodes) {
@@ -64,7 +66,7 @@ IntGraph LMG(const IntGraph& G, int S) {
             if (G[0][v].storage <= G[pred][v].storage) {
                 rho[v] = INFINITY;
             } else {
-                rho[v] = (double) dependency_count[v] * retrieval_cost[v] / (G[0][v].storage - G[pred][v].storage);
+                rho[v] = double(dependency_count[v]) * retrieval_cost[v] / (G[0][v].storage - G[pred][v].storage);
             }
         }
         auto iter = std::max_element(rho.begin(), rho.end(),
@@ -100,11 +102,13 @@ IntGraph LMG(const IntGraph& G, int S) {
         H.delete_edge(pred, candidate);
         H.add_or_modify_edge(0, candidate, G[0][candidate]);
         active_nodes.erase(candidate);
+        rho.erase(candidate);
         for (auto v : H.get_nodes(false)) {
             if (active_nodes.find(v) == active_nodes.end())
                 continue;
             if (G[0][v].storage - H[pred][v].storage > storage_surplus) {
                 active_nodes.erase(v);
+                rho.erase(v);
             }
         }
     }
@@ -166,6 +170,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_edges.empty()) {
+        cout << active_edges.size() << "edges left\n";
         // 1. Calculate rho for all active nodes and find maximum
         map<int, double> rho; // For each i, rho[i] is the value over cost of replacing some edge with edge i.
         for (auto i : active_edges) {
@@ -218,6 +223,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
         H.delete_edge(pred, v);
         H.add_or_modify_edge(u, v, w);
         active_edges.erase(iter->first);
+        rho.erase(iter->first);
         for (auto i = 0; i < edges.size(); i++) {
             if (active_edges.find(i) == active_edges.end())
                 continue;
@@ -225,6 +231,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
             auto pred = H.get_in_neighbors_of(v, true)[0];
             if (w.storage - H[pred][v].storage > storage_surplus) {
                 active_edges.erase(i);
+                rho.erase(iter->first);
             }
         }
     }

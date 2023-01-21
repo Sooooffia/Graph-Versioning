@@ -63,6 +63,7 @@ IntGraph::IntGraph(const vector<tuple<int, int, edge_variables>>& edges) {
             make_node(succ);
         make_edge(pred, succ, costs);
     }
+    n = nodes.size() - 1;
 }
 IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
     // lambda
@@ -74,6 +75,10 @@ IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
             make_edge(u, v, { rand() % 100 + 1,  rand() % 100 + 1});
         }
     };
+
+    nodes.reserve(node_count);
+    inNeighbors.reserve(node_count);
+    outNeighbors.reserve(node_count);
     make_node(0);
     while (n < node_count) {
         n++;
@@ -139,7 +144,9 @@ vector<tuple<int, int, edge_variables>> IntGraph::get_edges(bool aux) const {
     }
     return output;
 }
-int IntGraph::size() const {
+int IntGraph::size(bool aux) const {
+    if (aux)
+        return n+1;
     return n;
 }
 vector<int> IntGraph::get_in_neighbors_of(int v, bool aux) const {
@@ -239,7 +246,7 @@ IntGraph MST(const IntGraph& G) {
     auto m = edges.size();
 
     /// Calculating MST the fast way
-    arbok::Gabow alg(5, m);
+    arbok::Gabow alg(G.size(true), m);
     for (const auto& e:edges){
         int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
         alg.create_edge(u,v,w);

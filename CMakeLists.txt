@@ -41,8 +41,10 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         )
     endif()
 endif()
-add_executable(Graph-Versioning main.cpp Graph.cpp DP.h LMG.cpp)
+add_executable(Graph-Versioning main.cpp Graph.cpp DP.h LMG.cpp Gurobi.h)
 target_include_directories(Graph-Versioning PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories(Graph-Versioning PUBLIC /Library/gurobi1000/macos_universal2/include)
+
 add_subdirectory(MST)
 
 
