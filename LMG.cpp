@@ -1,4 +1,5 @@
 #include "LMG.h"
+#include <limits>
 using std::map;
 using std::pair;
 using std::cout;
@@ -64,7 +65,7 @@ IntGraph LMG(const IntGraph& G, int S) {
             int pred = H.get_in_neighbors_of(v, true)[0];
             // The storage budget SHOULD allow for materializing v.
             if (G[0][v].storage <= G[pred][v].storage) {
-                rho[v] = INFINITY;
+                rho[v] = std::numeric_limits<double>::infinity();
             } else {
                 rho[v] = double(dependency_count[v]) * retrieval_cost[v] / (G[0][v].storage - G[pred][v].storage);
             }
@@ -181,7 +182,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
             if (retrieval_reduction <= 0 or dependency_set[v].find(u) != dependency_set[v].end() ) { // if (u,v) forms a cycle or retrieval does not decrease
                 rho[i] = -1;
             } else if (G[0][v].storage <= G[pred][v].storage) {
-                rho[i] = INFINITY;
+                rho[i] = std::numeric_limits<double>::infinity();
             } else {
                 rho[i] = (double) dependency_set[v].size() * retrieval_reduction
                          / (G[0][v].storage - G[pred][v].storage);

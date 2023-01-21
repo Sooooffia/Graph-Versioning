@@ -152,11 +152,11 @@ void test_LMG() {
 //        std::cout << u << ' ' << v << ' ' << w << '\n';
 //    }
 
-    IntGraph G(1000, 0.1, true);
+    IntGraph G(1002, 0.2, true);
     auto M = MST(G);
     int S = int(M.get_total_storage_cost() * 1.2);
     auto H = LMG(G, S);
-    cout << S << endl << H.get_total_storage_cost();
+    cout << S << endl << H.get_total_storage_cost() << endl;
 }
 
 void test_LMG_all() {
@@ -196,7 +196,7 @@ void test_LMG_all() {
 //    for(auto [u,v,w] : H4.get_edges(true)){
 //        std::cout << u << ' ' << v << ' ' << w << '\n';
 //    }
-    IntGraph G(1000, 0.1, true);
+    IntGraph G(1001, 0.1, true);
     auto M = MST(G);
     int S = int(M.get_total_storage_cost() * 1.2);
     auto H = LMG_all(G, S);
