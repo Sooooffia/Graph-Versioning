@@ -209,5 +209,6 @@ void test_prob3_ILP() {
     auto M = MST(G);
     int S = int(M.get_total_storage_cost() * 1.2);
     IntGraph H = prob3_ILP(G, S);
-
+    cout << "M's storage and retrieval: " << M.get_total_storage_cost() << " and " << M.get_total_retrieval_cost() << endl;
+    cout << "H's storage and retrieval: " << H.get_total_storage_cost() << " and " << H.get_total_retrieval_cost() << endl;
 }

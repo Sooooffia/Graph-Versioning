@@ -96,8 +96,22 @@ public:
     [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
     unordered_map<int, edge_variables> operator[](int) const;
-    int get_total_storage_cost();
-    int get_total_retrieval_cost();
+    /**
+     * @note The graph must be an arborescence!
+     * @param dependency_count: int -> int. dependency_count[v] is the number of dependent nodes of v in H, including v itself.
+     * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
+     */
+    void get_dependency_count_and_retrieval_cost(unordered_map<int, int>& dependency_count,
+                                  unordered_map<int, int>& retrieval_cost) const;
+    /**
+     * @note The graph must be an arborescence!
+     * @param dependency_count: int -> set<int>. dependency_count[v] is the set of dependent nodes of v in H, including v itself.
+     * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
+     */
+    void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
+                                      unordered_map<int, int>& retrieval_cost) const;
+    int get_total_storage_cost() const;
+    int get_total_retrieval_cost() const;
 
     // Modifiers //
     /**

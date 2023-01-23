@@ -1,14 +1,25 @@
 cmake_minimum_required(VERSION 3.22)
 project(Graph-Versioning)
-set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++20 -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3")
 add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp)
-target_include_directories(Graph-Versioning PUBLIC "${PROJECT_BINARY_DIR}")
+
+#TODO: try find_library if everything else works
+#find_library(Gurobi_c++ NAMES libgurobi_c++)
+#if(NOT Gurobi_c++)
+#    message(FATAL_ERROR "Failed to find Gurobi lib.  Try setting CMAKE_PREFIX_PATH")
+#endif()
+#target_link_libraries(Graph-Versioning ${Gurobi_c++})
+
+#TODO: Can't link to gurobi. What is missing?
+target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi_c++.a)
+
 target_include_directories(Graph-Versioning PUBLIC /Library/gurobi1000/macos_universal2/include)
 add_subdirectory(MST)
 OPTION (USE_OpenMP "Use OpenMP to enamble <omp.h>" ON)
+
+#TODO: figure out what this does. (this is from the MST library)
 #if(APPLE AND USE_OpenMP)
 #    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
 #        set(OpenMP_C "${CMAKE_C_COMPILER}")

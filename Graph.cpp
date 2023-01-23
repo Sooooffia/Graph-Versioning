@@ -232,7 +232,66 @@ void IntGraph::delete_node(int v) {
 unordered_map<int, edge_variables> IntGraph::operator[](int u) const {
     return get_out_edges_of(u);
 }
-int IntGraph::get_total_storage_cost() {
+void IntGraph::get_dependency_count_and_retrieval_cost(unordered_map<int, int>& dependency_count,
+                                             unordered_map<int, int>& retrieval_cost) const {
+    for (auto v : get_nodes(false)) {
+        dependency_count[v] = 1;
+    }
+    // 1. Push element into stack in bfs order, and calculate their retrieval cost along the way.
+    vector<int> stack{0};
+    retrieval_cost[0] = dependency_count[0] = 0;
+    size_t ind = 0;
+    while (ind < stack.size()) {
+        auto children = get_out_neighbors_of(stack[ind]);
+        for (auto child : children) {
+            stack.push_back(child);
+            retrieval_cost[child] = retrieval_cost[stack[ind]] + (*this)[stack[ind]][child].retrieval;
+        }
+        ind++;
+    }
+
+    // 2. Go backwards in stack and note the number of descendents
+    ind = stack.size() - 1;
+    while (ind > 0) {
+        auto &dep = dependency_count[stack[ind]];
+        auto children = get_out_neighbors_of(stack[ind]);
+        for (auto child : children) {
+            dep += dependency_count[child];
+        }
+        ind--;
+    }
+}
+void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
+                                            unordered_map<int, int>& retrieval_cost) const {
+    for (auto v : get_nodes(false)) {
+        dependency_list[v].insert(v);
+    }
+    // 1. Push element into stack in bfs order, and calculate their retrieval cost along the way.
+    vector<int> stack{0};
+    retrieval_cost[0] = 0;
+    // TODO: dependency of 0 is everyone? Necessary?
+    size_t ind = 0;
+    while (ind < stack.size()) {
+        auto children = get_out_neighbors_of(stack[ind]);
+        for (auto child : children) {
+            stack.push_back(child);
+            retrieval_cost[child] = retrieval_cost[stack[ind]] + (*this)[stack[ind]][child].retrieval;
+        }
+        ind++;
+    }
+
+    // 2. Go backwards in stack and note the number of descendents
+    ind = stack.size() - 1;
+    while (ind > 0) {
+        auto &dep = dependency_list[stack[ind]];
+        auto children = get_out_neighbors_of(stack[ind]);
+        for (auto child : children) {
+            dep.insert(dependency_list[child].begin(), dependency_list[child].end());
+        }
+        ind--;
+    }
+}
+int IntGraph::get_total_storage_cost() const {
     int ans = 0;
     auto edges = get_edges(true);
     for (auto e : edges) {
@@ -240,6 +299,18 @@ int IntGraph::get_total_storage_cost() {
     }
     return ans;
 }
+
+int IntGraph::get_total_retrieval_cost() const {
+    unordered_map<int, int> dependency_count;
+    unordered_map<int, int> retrieval_cost;
+    get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
+    int ans = 0;
+    for (int v : nodes) {
+        ans += dependency_count[v] * retrieval_cost[v];
+    }
+    return ans;
+}
+
 IntGraph MST(const IntGraph& G) {
     auto edges = G.get_edges(true);
     auto nodes = G.get_nodes_and_storage(true);

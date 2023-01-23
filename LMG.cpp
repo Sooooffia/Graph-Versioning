@@ -4,36 +4,6 @@ using std::map;
 using std::pair;
 using std::cout;
 
-/// Initialization helper: calculating dependency and retrieval for the first time.
-void initialize_variables_LMG(IntGraph& H, unordered_map<int, int>& dependency_count,
-                               unordered_map<int, int>& retrieval_cost) {
-    for (auto v : H.get_nodes(false)) {
-        dependency_count[v] = 1;
-    }
-    // 1. Push element into stack in bfs order, and calculate their retrieval cost along the way.
-    vector<int> stack{0};
-    retrieval_cost[0] = dependency_count[0] = 0;
-    size_t ind = 0;
-    while (ind < stack.size()) {
-        auto children = H.get_out_neighbors_of(stack[ind]);
-        for (auto child : children) {
-            stack.push_back(child);
-            retrieval_cost[child] = retrieval_cost[stack[ind]] + H[stack[ind]][child].retrieval;
-        }
-        ind++;
-    }
-
-    // 2. Go backwards in stack and note the number of descendents
-    ind = stack.size() - 1;
-    while (ind > 0) {
-        auto &dep = dependency_count[stack[ind]];
-        auto children = H.get_out_neighbors_of(stack[ind]);
-        for (auto child : children) {
-            dep += dependency_count[child];
-        }
-        ind--;
-    }
-}
 
 IntGraph LMG(const IntGraph& G, int S) {
     IntGraph H = MST(G); // The current graph that LMG works on. Initially it's the MST.
@@ -45,7 +15,8 @@ IntGraph LMG(const IntGraph& G, int S) {
     /// Initializing dependency, retrieval, and active nodes
     unordered_map<int, int> dependency_count;
     unordered_map<int, int> retrieval_cost;
-    initialize_variables_LMG(H, dependency_count, retrieval_cost);
+
+    H.get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
 
 
     unordered_set<int> active_nodes; // The set of nodes that are not materialized, and that our budget allows for materialization.
@@ -115,38 +86,6 @@ IntGraph LMG(const IntGraph& G, int S) {
     }
     return H;
 }
-
-void initialize_variables_LMG_all(IntGraph& H, unordered_map<int, unordered_set<int>>& dependency_list,
-                                  unordered_map<int, int>& retrieval_cost) {
-    for (auto v : H.get_nodes(false)) {
-        dependency_list[v].insert(v);
-    }
-    // 1. Push element into stack in bfs order, and calculate their retrieval cost along the way.
-    vector<int> stack{0};
-    retrieval_cost[0] = 0;
-    // TODO: dependency of 0 is everyone? Necessary?
-    size_t ind = 0;
-    while (ind < stack.size()) {
-        auto children = H.get_out_neighbors_of(stack[ind]);
-        for (auto child : children) {
-            stack.push_back(child);
-            retrieval_cost[child] = retrieval_cost[stack[ind]] + H[stack[ind]][child].retrieval;
-        }
-        ind++;
-    }
-
-    // 2. Go backwards in stack and note the number of descendents
-    ind = stack.size() - 1;
-    while (ind > 0) {
-        auto &dep = dependency_list[stack[ind]];
-        auto children = H.get_out_neighbors_of(stack[ind]);
-        for (auto child : children) {
-            dep.insert(dependency_list[child].begin(), dependency_list[child].end());
-        }
-        ind--;
-    }
-}
-
 IntGraph LMG_all(const IntGraph& G, int S) {
     IntGraph H = MST(G); // The current graph that LMG works on. Initially it's the MST.
     int storage_surplus = S - H.get_total_storage_cost();
@@ -157,7 +96,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
     /// Initializing dependency, retrieval, and active nodes
     unordered_map<int, unordered_set<int>> dependency_set;
     unordered_map<int, int> retrieval_cost;
-    initialize_variables_LMG_all(H, dependency_set, retrieval_cost);
+    H.get_dependency_list_and_retrieval_cost(dependency_set, retrieval_cost);
 
     unordered_set<int> active_edges; // The set of nodes that are not materialized, and that our budget allows for materialization.
     auto edges = G.get_edges(true);
