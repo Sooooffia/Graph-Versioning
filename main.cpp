@@ -5,7 +5,7 @@
 using std::cout;
 
 int main() {
-    test_LMG_all();
-
+//    test_LMG_all();
+    test_prob3_ILP();
     return 0;
 }

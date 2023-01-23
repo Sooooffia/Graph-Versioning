@@ -1,6 +1,7 @@
 #include "Graph.hpp"
 #include "LMG.h"
 #include <iostream>
+#include "OPT.h"
 #define CHECK(x) { if (!(x)) std::cout << __FUNCTION__ << " failed on line " << __LINE__ << std::endl; }
 using namespace std;
 
@@ -201,4 +202,12 @@ void test_LMG_all() {
     int S = int(M.get_total_storage_cost() * 1.2);
     auto H = LMG_all(G, S);
     cout << S << endl << H.get_total_storage_cost();
+}
+
+void test_prob3_ILP() {
+    IntGraph G(101, 0.1, true);
+    auto M = MST(G);
+    int S = int(M.get_total_storage_cost() * 1.2);
+    IntGraph H = prob3_ILP(G, S);
+
 }
