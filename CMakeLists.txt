@@ -2,20 +2,25 @@ cmake_minimum_required(VERSION 3.22)
 project(Graph-Versioning)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3")
-add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.cpp test_DP.h)
 
 #TODO: try find_library if everything else works
-#find_library(Gurobi_c++ NAMES libgurobi_c++)
+#find_library(Gurobi_c++ NAMES libgurobi_c++.a libgurobi100.dylib PATH /Library/gurobi1000/macos_universal2/src/build
+#        /Library/gurobi1000/macos_universal2/lib)
+#target_link_libraries(Graph-Versioning Gurobi_c++)
+
 #if(NOT Gurobi_c++)
 #    message(FATAL_ERROR "Failed to find Gurobi lib.  Try setting CMAKE_PREFIX_PATH")
 #endif()
 #target_link_libraries(Graph-Versioning ${Gurobi_c++})
 
-#TODO: Can't link to gurobi. What is missing?
-target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi_c++.a)
+#TODO: This is for Bob's mac.
+target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/src/build/libgurobi_c++.a)
+target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi100.dylib)
 
 target_include_directories(Graph-Versioning PUBLIC /Library/gurobi1000/macos_universal2/include)
+
 add_subdirectory(MST)
 OPTION (USE_OpenMP "Use OpenMP to enamble <omp.h>" ON)
 

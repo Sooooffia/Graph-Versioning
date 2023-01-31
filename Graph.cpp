@@ -11,12 +11,14 @@ ostream& operator<<(ostream& os, const edge_variables& w) {
 }
 
 // Helper functions //
-void IntGraph::make_node(int v){
+void IntGraph::make_node(int v) {
+    if (v != 0)
+        n++;
     nodes.insert(v);
     inNeighbors.insert({v,unordered_map<int,edge_variables>()});
     outNeighbors.insert({v,unordered_map<int,edge_variables>()});
 }
-void IntGraph::make_edge(int u, int v, const edge_variables& costs){
+void IntGraph::make_edge(int u, int v, const edge_variables& costs) {
     inNeighbors[v][u] = costs;
     outNeighbors[u][v] = costs;
 }
@@ -26,20 +28,18 @@ IntGraph::IntGraph() { make_node(0); }
 IntGraph::IntGraph(int node_number) {
     make_node(0);
     while (n < node_number) {
-        n++;
-        make_node(n);
+        make_node(n+1);
         make_edge(0,n,{0,0});
     }
 }
 IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<int, int, edge_variables>>& edges) {
     make_node(0);
-    for (auto v : vertices){
+    for (auto v : vertices) {
         if (get<0>(v) == 0)
             throw invalid_argument("IntGraph initialization: auxiliary root involved in nodes.");
         int& vertex = get<0>(v);
         int& storage =  get<1>(v);
         make_node(vertex);
-        n++;
         make_edge(0,vertex,{storage,0});
     }
     for (auto e : edges) {
@@ -53,6 +53,7 @@ IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<in
     }
 }
 IntGraph::IntGraph(const vector<tuple<int, int, edge_variables>>& edges) {
+    make_node(0);
     for (auto e : edges) {
         int& pred = get<0>(e);
         int& succ = get<1>(e);
@@ -63,7 +64,6 @@ IntGraph::IntGraph(const vector<tuple<int, int, edge_variables>>& edges) {
             make_node(succ);
         make_edge(pred, succ, costs);
     }
-    n = nodes.size() - 1;
 }
 IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
     // lambda
@@ -81,8 +81,7 @@ IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
     outNeighbors.reserve(node_count);
     make_node(0);
     while (n < node_count) {
-        n++;
-        make_node(n);
+        make_node(n+1);
         make_edge(0,n,{rand() % 100 + 1,0});
     }
     // TODO: seed? This random produces the same results each time.
@@ -178,7 +177,6 @@ vector<int> IntGraph::add_node(int node_count) {
             make_node(i);
             make_edge(0,i,{0,0});
             output.push_back(i);
-            n ++;
             node_count --;
         }
         i++;
@@ -196,12 +194,17 @@ vector<int> IntGraph::add_node_with_storage(const vector<tuple<int, int>>& verti
     }
     return output;
 }
-void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs) {
+void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs, bool new_node) {
     // TODO: check if duplicate
-    if (u == v){
+    if (u == v) {
         throw invalid_argument("Self-loop error in add_or_modify_edge.");
     }
-    if (nodes.find(u) == nodes.end() || nodes.find(v) == nodes.end()){
+    if (new_node) {
+        if (nodes.find(u) == nodes.end())
+            make_node(u);
+        if (nodes.find(v) == nodes.end())
+            make_node(v);
+    } else if (nodes.find(u) == nodes.end() or nodes.find(v) == nodes.end()) {
         throw invalid_argument("Nodes cannot be found in add_or_modify_edge.");
     }
     make_edge(u,v,costs);
@@ -299,7 +302,6 @@ int IntGraph::get_total_storage_cost() const {
     }
     return ans;
 }
-
 int IntGraph::get_total_retrieval_cost() const {
     unordered_map<int, int> dependency_count;
     unordered_map<int, int> retrieval_cost;
@@ -310,10 +312,24 @@ int IntGraph::get_total_retrieval_cost() const {
     }
     return ans;
 }
-
+vector<int> IntGraph::get_nodes_in_topo_order(bool aux) const {//TODO: not tested
+    vector<int> pq{0};
+    bool visited[n+1]; // initially false
+    memset(visited, 0, sizeof(visited));
+    int ind = 0;
+    while (ind != pq.size()) {
+        for (int child : get_out_neighbors_of(pq[ind])) if (!visited[child]) {
+            pq.push_back(child);
+            visited[child] = true;
+        }
+        ind++;
+    }
+    if (not aux)
+        pq.erase(pq.begin());
+    return pq;
+}
 IntGraph MST(const IntGraph& G) {
     auto edges = G.get_edges(true);
-    auto nodes = G.get_nodes_and_storage(true);
     auto m = edges.size();
 
     /// Calculating MST the fast way
@@ -322,12 +338,34 @@ IntGraph MST(const IntGraph& G) {
         int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
         alg.create_edge(u,v,w);
     }
-    int root = 0;
-    alg.run(root);
-    auto edge_indices = alg.reconstruct(root);
+    alg.run(0);
+    auto edge_indices = alg.reconstruct(0);
     vector<tuple<int, int, edge_variables>> MST_edges;
     for (auto ind : edge_indices) {
         MST_edges.push_back(edges[ind]);
     }
     return IntGraph(MST_edges);
+}
+
+IntGraph MST_with_designated_root(const IntGraph &G, int r) {//TODO: not tested
+    auto edges = G.get_edges(false);
+    auto m = edges.size();
+
+    /// Calculating MST the fast way
+    arbok::Gabow alg(G.size(false), m);
+    for (const auto& e : edges){
+        int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
+        alg.create_edge(u-1, v-1, w);
+    }
+    alg.run(r-1);
+    auto edge_indices = alg.reconstruct(r-1);
+    vector<tuple<int, int, edge_variables>> MST_edges;
+    for (auto ind : edge_indices) {
+        MST_edges.push_back(edges[ind]);
+    }
+    IntGraph H(MST_edges);// H has no auxiliary root
+    for (auto v : H.get_nodes(false)) {
+        H.add_or_modify_edge(0, v, G[0][v]);
+    }
+    return H;
 }

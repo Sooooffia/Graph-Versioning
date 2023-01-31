@@ -56,15 +56,15 @@ IntGraph LMG(const IntGraph& G, int S) {
         }
 
         // 3. Modify retrieval
-        vector<int> stack{candidate};
+        vector<int> pq{candidate};
         size_t ind = 0;
-        while (ind != stack.size()) {
-            retrieval_cost[stack[ind]] -= retrieval_reduction;
-            auto children = H.get_out_neighbors_of(stack[ind]);
-            stack.insert(stack.end(), children.begin(), children.end());
+        while (ind != pq.size()) {
+            retrieval_cost[pq[ind]] -= retrieval_reduction;
+            auto children = H.get_out_neighbors_of(pq[ind]);
+            pq.insert(pq.end(), children.begin(), children.end());
             ind++;
         }
-        for (auto v : stack) {
+        for (auto v : pq) {
             retrieval_cost[v] -= retrieval_reduction;
         }
 

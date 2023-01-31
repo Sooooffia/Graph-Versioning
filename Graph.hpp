@@ -13,6 +13,7 @@ using std::vector;
 using std::tuple;
 using std::invalid_argument;
 using std::logic_error;
+using std::istream;
 using std::ostream;
 
 struct edge_variables{
@@ -96,22 +97,23 @@ public:
     [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
     unordered_map<int, edge_variables> operator[](int) const;
+    [[nodiscard]] int get_total_storage_cost() const;
+    [[nodiscard]] int get_total_retrieval_cost() const;
+    [[nodiscard]] vector<int> get_nodes_in_topo_order(bool aux) const;///< Assuming there is no cycle!
     /**
-     * @note The graph must be an arborescence!
+     * @note The graph must be an arborescence rooted at 0!
      * @param dependency_count: int -> int. dependency_count[v] is the number of dependent nodes of v in H, including v itself.
      * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
      */
     void get_dependency_count_and_retrieval_cost(unordered_map<int, int>& dependency_count,
                                   unordered_map<int, int>& retrieval_cost) const;
     /**
-     * @note The graph must be an arborescence!
+     * @note The graph must be an arborescence rooted at 0!
      * @param dependency_count: int -> set<int>. dependency_count[v] is the set of dependent nodes of v in H, including v itself.
      * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
      */
     void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
                                       unordered_map<int, int>& retrieval_cost) const;
-    int get_total_storage_cost() const;
-    int get_total_retrieval_cost() const;
 
     // Modifiers //
     /**
@@ -134,10 +136,11 @@ public:
      * @param u pred
      * @param v succ
      * @param costs costs assigned to this directed edge
+     * @param new_node marks whether we can potentially create new nodes with this call.
      * Adds directed (u,v) to graph. Throw exception if adds repeated edge or self-loop.
      * Costs are 0 by default.
      */
-    void add_or_modify_edge(int u, int v, edge_variables costs = {0,0});
+    void add_or_modify_edge(int u, int v, edge_variables costs = {0,0}, bool new_node=false);
 
     /**
      * @param u pred
@@ -148,9 +151,17 @@ public:
 };
 
 /**
- * @param G a connected IntGraph
- * @returns H a minimum spanning arborescence of G
+ * @param G: a connected IntGraph.
+ * @returns A minimum spanning arborescence of G.
  */
 IntGraph MST(const IntGraph& G);
+
+/**
+ * @param G: an IntGraph where r can reach all nodes except 0.
+ * @param r: the root to calculate MST from.
+ * @return IntGraph H, where H\{0} is a minimum spanning arborescence of G\{0}, rooted at r.
+ * This should be useful for heuristics. (extracting arborescence from
+ */
+IntGraph MST_with_designated_root(const IntGraph &G, int r);
 
 #endif //DATA_VERSIONING_C_GRAPH_H
