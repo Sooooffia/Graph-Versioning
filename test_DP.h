@@ -9,7 +9,7 @@ void try_DP_on_rg() {
     int S_min = M.get_total_storage_cost();
     IntGraph Arb = MST_with_designated_root(G, 1);
 
-    int ans = DP_arborescence(Arb, 1, 300, S_min * 1.2, M.get_total_retrieval_cost());
+    int ans = DP_arborescence(Arb, 1, 5, S_min * 1.2, M.get_total_retrieval_cost() / 4);
 //    int opt = prob3_ILP(Arb, S_min * 1.2).get_total_retrieval_cost();
 
     cout << ans << " ";
