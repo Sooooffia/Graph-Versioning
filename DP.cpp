@@ -68,9 +68,8 @@ int DP_arborescence(IntGraph &G, int r, double epsilon, int S, int R_max) {
     }
 
     // 2. Base cases
-    int DP[n+1][n+1][T]; // make sure this is not too large
+    vector<vector<vector<int>>> DP(n+1, vector<vector<int>>(n+1, vector<int>(T, INT32_MAX))); // Too large?
     int OPT[n+1][T]; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
-    memset(DP, 127, sizeof(DP)); // setting DP to large number
     std::reverse(nodes.begin(), nodes.end());
     for (auto v : nodes) {
         if (G.get_out_neighbors_of(v).empty()) {
