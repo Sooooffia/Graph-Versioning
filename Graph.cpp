@@ -3,6 +3,7 @@
 //
 
 #include "Graph.hpp"
+#include <cstring>
 using namespace std;
 
 ostream& operator<<(ostream& os, const edge_variables& w) {

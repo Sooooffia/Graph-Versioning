@@ -162,4 +162,5 @@ int DP_arborescence(IntGraph &G, int r, double l, int S, int R_of_MST) {
         if (OPT[r][t] > S)
             return (t+1) * l;
     }
+    throw std::logic_error("DP can't return anything");
 }
