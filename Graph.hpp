@@ -99,7 +99,7 @@ public:
     unordered_map<int, edge_variables> operator[](int) const;
     [[nodiscard]] int get_total_storage_cost() const;
     [[nodiscard]] int get_total_retrieval_cost() const;
-    [[nodiscard]] vector<int> get_nodes_in_topo_order(bool aux) const;///< Assuming there is no cycle!
+    [[nodiscard]] vector<int> get_nodes_in_topo_order(int r) const;///< Not including 0. Assuming there is no cycle!
     /**
      * @note The graph must be an arborescence rooted at 0!
      * @param dependency_count: int -> int. dependency_count[v] is the number of dependent nodes of v in H, including v itself.
@@ -163,5 +163,69 @@ IntGraph MST(const IntGraph& G);
  * This should be useful for heuristics. (extracting arborescence from
  */
 IntGraph MST_with_designated_root(const IntGraph &G, int r);
+
+// Outputting a vector like python list
+template <typename T>
+ostream& operator<<(ostream& os, const vector<T>& V)
+{
+    os << '[';
+    for (auto it = V.begin(); it != V.end(); ) {
+        os << *it;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "]";
+    return os;
+}
+// Outputting an unordered set like python set
+template <typename T>
+ostream& operator<<(ostream& os, const unordered_set<T>& V)
+{
+    os << '{';
+    for (auto it = V.begin(); it != V.end();) {
+        os << *it;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "}";
+    return os;
+}
+// Outputting an unordered set like python dict
+template <typename S, typename T>
+ostream& operator<<(ostream& os, const unordered_map<S, T>& V)
+{
+    os << '{';
+    for (auto it = V.begin(); it != V.end();) {
+        os << it->first << ": " << it->second;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "}";
+    return os;
+}
+// Outputting a tuple like python tuple
+template<class Tuple, size_t N>
+struct TuplePrinter {
+    static void print(ostream& os, const Tuple& t)
+    {
+        TuplePrinter<Tuple, N-1>::print(os, t);
+        os << ", " << get<N-1>(t);
+    }
+};
+template<class Tuple>
+struct TuplePrinter<Tuple, 1> {
+    static void print(ostream& os, const Tuple& t)
+    {
+        os << get<0>(t);
+    }
+};
+template<class... Args>
+ostream& operator<<(ostream& os, const std::tuple<Args...>& t)
+{
+    os << "(";
+    TuplePrinter<decltype(t), sizeof...(Args)>::print(os, t);
+    os << ")";
+    return os;
+}
 
 #endif //DATA_VERSIONING_C_GRAPH_H

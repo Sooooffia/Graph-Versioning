@@ -312,20 +312,18 @@ int IntGraph::get_total_retrieval_cost() const {
     }
     return ans;
 }
-vector<int> IntGraph::get_nodes_in_topo_order(bool aux) const {//TODO: not tested
-    vector<int> pq{0};
+vector<int> IntGraph::get_nodes_in_topo_order(int r) const {//TODO: not tested
+    vector<int> pq{r};
     bool visited[n+1]; // initially false
     memset(visited, 0, sizeof(visited));
     int ind = 0;
-    while (ind != pq.size()) {
+    while (ind < pq.size()) {
         for (int child : get_out_neighbors_of(pq[ind])) if (!visited[child]) {
             pq.push_back(child);
             visited[child] = true;
         }
         ind++;
     }
-    if (not aux)
-        pq.erase(pq.begin());
     return pq;
 }
 IntGraph MST(const IntGraph& G) {

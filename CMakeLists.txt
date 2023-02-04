@@ -16,6 +16,9 @@ add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.
 #target_link_libraries(Graph-Versioning ${Gurobi_c++})
 
 #TODO: This is for Bob's mac.
+#find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi100.dylib" HINTS "/Library/gurobi1000/macos_universal2/src/build"
+#        "/Library/gurobi1000/macos_universal2/lib")
+#target_link_libraries(Graph-Versioning GUROBI_LIB)
 target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/src/build/libgurobi_c++.a)
 target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi100.dylib)
 

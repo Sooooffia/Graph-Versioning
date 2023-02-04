@@ -34,8 +34,9 @@ IntGraph make_binary(const IntGraph &G, int r) {//TODO: not tested
 unordered_map<int, int> get_descendants_of_arb(const IntGraph &G, int r) {
     unordered_map<int, int> desc_count;
     vector<int> stack{r};
-    size_t ind = 0;
+    int ind = 0;
     while (ind < stack.size()) {
+        desc_count[stack[ind]] = 1;
         auto children = G.get_out_neighbors_of(stack[ind]);
         for (auto child : children) {
             stack.push_back(child);
@@ -43,47 +44,56 @@ unordered_map<int, int> get_descendants_of_arb(const IntGraph &G, int r) {
         ind++;
     }
     ind = stack.size() - 1;
-    while (ind > 0) {
-        auto &desc = desc_count[stack[ind]];
+    while (ind >= 0) {
         auto children = G.get_out_neighbors_of(stack[ind]);
         for (int child : children) {
-            desc += desc_count[child];
+            desc_count[stack[ind]] += desc_count[child];
         }
         ind--;
     }
     return desc_count;
 }
 
-int DP_arborescence(IntGraph &G, int r, double epsilon, int S, int R_max) {
+int DP_arborescence(IntGraph &G, int r, double epsilon, int S, int R_of_MST) {
     G = make_binary(G, r);
     // 1. Calculating parameters
-    auto nodes = G.get_nodes_in_topo_order(false);
+    auto nodes = G.get_nodes_in_topo_order(r);
     auto edges = G.get_edges(false);
     int n = nodes.size();
 
-    int T = std::min(R_max, int(1/epsilon));
-    double l = R_max / T;
+    int R_max = 0;// max retrieval of a single edge
+    for (const auto &e : edges) {
+        if (std::get<2>(e).retrieval > R_max)
+            R_max = std::get<2>(e).retrieval;
+    }
+    int retrieval_multiplier = n * (n-1) / 2;
+    double l = std::max(1.0, epsilon * R_max / retrieval_multiplier);
+    int T = R_of_MST / l;
     for (auto &[u,v,w]: G.get_edges(false)) {
         w.retrieval /= l;
+        w.retrieval += 1;
     }
 
     // 2. Base cases
-    vector<vector<vector<int>>> DP(n+1, vector<vector<int>>(n+1, vector<int>(T, INT32_MAX))); // Too large?
-    int OPT[n+1][T]; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
+    vector<vector<vector<int>>> DP(n+1, vector<vector<int>>(n+1, vector<int>(T, 100000001))); // Too large?
+    vector<vector<int>> OPT(n+1, vector<int>(T, 100000001)); // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
     std::reverse(nodes.begin(), nodes.end());
+    // count number of possible descendents
+    unordered_map<int, int> desc_count = get_descendants_of_arb(G, r);
+    std::cout << "desc_count: " << desc_count << std::endl;
     for (auto v : nodes) {
-        if (G.get_out_neighbors_of(v).empty()) {
+        if (desc_count[v] == 1) {
             for (int t=0; t < T; t++) {
-                DP[v][1][t] = 0;
-                OPT[v][t] = 0;
+                DP[v][1][t] = G[0][v].storage;
+                OPT[v][t] = G[0][v].storage;
             }
         }
     }
-    // count number of possible descendents
-    unordered_map<int, int> desc_count = get_descendants_of_arb(G, r);
 
     // 3. Recursion
+    std::cout << "nodes = " << nodes;
     for (auto v : nodes) {
+        std::cout << "recursion on node " << v << std::endl;
         auto out_edges = G.get_out_edges_of(v);
         if (out_edges.size() == 1) {
             int child = out_edges.begin()->first;
@@ -147,8 +157,9 @@ int DP_arborescence(IntGraph &G, int r, double epsilon, int S, int R_max) {
                 OPT[v][t] = std::min(OPT[v][t], DP[v][k][t]);
         }
     }
+    std::cout << OPT[r] << std::endl;
     for (int t = T; t >= 0; t--) {
         if (OPT[r][t] > S)
-            return t+1;
+            return (t+1) * l;
     }
 }
