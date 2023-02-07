@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(Graph-Versioning)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3")
 add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.cpp test_DP.h)
 
 #TODO: try find_library if everything else works
