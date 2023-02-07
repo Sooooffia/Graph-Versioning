@@ -190,9 +190,22 @@ ostream& operator<<(ostream& os, const unordered_set<T>& V)
     os << "}";
     return os;
 }
-// Outputting an unordered set like python dict
+// Outputting an unordered map like python dict
 template <typename S, typename T>
 ostream& operator<<(ostream& os, const unordered_map<S, T>& V)
+{
+    os << '{';
+    for (auto it = V.begin(); it != V.end();) {
+        os << it->first << ": " << it->second;
+        if (++it != V.end())
+            os << ", ";
+    }
+    os << "}";
+    return os;
+}
+// Outputting a map like python dict
+template <typename S, typename T>
+ostream& operator<<(ostream& os, const std::map<S, T>& V)
 {
     os << '{';
     for (auto it = V.begin(); it != V.end();) {

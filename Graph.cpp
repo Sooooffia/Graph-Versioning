@@ -196,7 +196,6 @@ vector<int> IntGraph::add_node_with_storage(const vector<tuple<int, int>>& verti
     return output;
 }
 void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs, bool new_node) {
-    // TODO: check if duplicate
     if (u == v) {
         throw invalid_argument("Self-loop error in add_or_modify_edge.");
     }

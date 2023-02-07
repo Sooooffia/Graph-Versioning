@@ -10,6 +10,6 @@ int main() {
 //    test_LMG_all();
 //    test_LMG_with_OPT();
     try_DP_on_rg();
-
+//    test_make_binary();
     return 0;
 }
