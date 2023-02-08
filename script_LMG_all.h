@@ -26,7 +26,7 @@ void LMG_vs_LMGA_on_git_graph(string name) {
     auto M = MST(G);
     int S_min = M.get_total_storage_cost();
 
-    for (double beta = 1; beta <= 2; beta += 0.05) {
+    for (double beta = 1; beta < 2; beta += 0.05) {
         auto start_LMG = high_resolution_clock::now();
         auto sol_LMG = LMG(G, S_min*beta);
         auto end_LMG = high_resolution_clock::now();

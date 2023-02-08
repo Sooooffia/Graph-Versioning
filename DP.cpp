@@ -135,7 +135,6 @@ int DP_arborescence(IntGraph &G, int r, double l, int S, int R_of_MST) {
                     }
                 }
                 // materialize both
-                // TODO: this is a very costly step. optimize.
                 for (auto k1 = 1; k1 < k; k1++) {
                     int k2 = k - 1 - k1, min_ret = std::min(ret1, ret2);
                     for (auto t = min_ret * (k - 1); t <= T; t++) {

@@ -25,7 +25,6 @@ void try_DP_on_rg() {
 //    int opt = prob3_ILP(Arb, S_min * 1.2).get_total_retrieval_cost();
 
     cout << ans << " ";
-//    cout << opt << endl;
     cout << M.get_total_retrieval_cost() << endl;
 }
 
