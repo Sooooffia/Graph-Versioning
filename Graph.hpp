@@ -97,8 +97,8 @@ public:
     [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
     unordered_map<int, edge_variables> operator[](int) const;
-    [[nodiscard]] int get_total_storage_cost() const;
-    [[nodiscard]] int get_total_retrieval_cost() const;
+    [[nodiscard]] long long get_total_storage_cost() const;
+    [[nodiscard]] long long get_total_retrieval_cost() const;
     [[nodiscard]] vector<int> get_nodes_in_topo_order(int r) const;///< Not including 0. Assuming there is no cycle!
     /**
      * @note The graph must be an arborescence rooted at 0!
