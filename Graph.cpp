@@ -293,19 +293,19 @@ void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unorder
         ind--;
     }
 }
-int IntGraph::get_total_storage_cost() const {
-    int ans = 0;
+long long IntGraph::get_total_storage_cost() const {
+    long long ans = 0;
     auto edges = get_edges(true);
     for (auto e : edges) {
         ans += get<2>(e).storage;
     }
     return ans;
 }
-int IntGraph::get_total_retrieval_cost() const {
+long long IntGraph::get_total_retrieval_cost() const {
     unordered_map<int, int> dependency_count;
     unordered_map<int, int> retrieval_cost;
     get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
-    int ans = 0;
+    long long ans = 0;
     for (int v : nodes) {
         ans += dependency_count[v] * retrieval_cost[v];
     }

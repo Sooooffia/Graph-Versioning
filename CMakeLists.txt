@@ -3,7 +3,7 @@ project(Graph-Versioning)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3")
-add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.cpp test_DP.h)
+add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.cpp test_DP.h script_LMG_all.h)
 
 #TODO: try find_library if everything else works
 #find_library(Gurobi_c++ NAMES libgurobi_c++.a libgurobi100.dylib PATH /Library/gurobi1000/macos_universal2/src/build

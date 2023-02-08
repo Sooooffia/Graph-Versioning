@@ -24,10 +24,9 @@ void write_graph(ostream &os, const IntGraph &G) {
  */
 IntGraph read_graph(istream &is) {
     string s;
-
     vector<tuple<int, int, edge_variables>> edges;
-    while (not is.eof()) {
-        int u, v, storage, retrieval;
+    int u{}, v{}, storage{}, retrieval{};
+    while (!is.eof()) {
         is >> u >> v >> storage >> retrieval;
         edges.emplace_back(u, v, edge_variables{storage, retrieval});
     }
