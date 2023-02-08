@@ -7,12 +7,12 @@
 using namespace arbok;
 
 Gabow::Gabow(int n, int /* m */)
-    : num_vertices(n)
-    , co(n)
-    , incoming_edges(n)
-    , exit_list(n)
-    , passive_set(n)
-    , active_forest(co)
+        : num_vertices(n)
+        , co(n)
+        , incoming_edges(n)
+        , exit_list(n)
+        , passive_set(n)
+        , active_forest(co)
 {
     growth_path.reserve(n); // cannot become larger
     path_edges.reserve(n);
@@ -65,7 +65,7 @@ std::vector<int> Gabow::reconstruct(int root) {
         if(leaf[edge.to]==-1) leaf[edge.to] = i;
     }
     leaf[root] = -2;
-    assert(std::none_of(begin(leaf), end(leaf), [](int l) { return l==-1; })); // assert each node has an incoming edge
+    assert(none_of(begin(leaf), end(leaf), [](int l) { return l==-1; })); // assert each node has an incoming edge
 
     std::vector<int> res;
     std::vector del(n,false);
@@ -145,7 +145,7 @@ int Gabow::contractPathPrefix(int u) {
     // condense all edges into the prefix to at most 1 per origin
     for(int vi : prefix) {
         // if we are here then there are no passive edges to any node earlier in prefix than vi
-        std::reverse(begin(passive_set[vi]),end(passive_set[vi])); // we want to iterate passive set in reverse order of insertion
+        reverse(begin(passive_set[vi]),end(passive_set[vi])); // we want to iterate passive set in reverse order of insertion
         for(auto edge_id : passive_set[vi]) {
             auto& edge = edges[edge_id];
             int from = co.find(edge.from);

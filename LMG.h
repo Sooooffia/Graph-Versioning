@@ -5,7 +5,6 @@
 #ifndef GRAPH_VERSIONING_LMG_H
 #define GRAPH_VERSIONING_LMG_H
 #include "Graph.hpp"
-#include "MST/gabow.h"
 
 /**
  * @param G: IntGraph, Version Graph

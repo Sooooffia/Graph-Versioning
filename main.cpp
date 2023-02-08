@@ -2,7 +2,6 @@
 #include <fstream>
 #include "Graph.hpp"
 #include "test_DP.h"
-#include "MST/gabow.h"
 #include "GraphIO.h"
 #include "script_LMG_all.h"
 
@@ -15,7 +14,7 @@ int main() {
 //    test_make_binary();
 
 //    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");
-//    LMG_vs_LMGA_on_git_graph("styleguide");
-    LMG_vs_LMGA_on_git_graph("gitignore");
+    LMG_vs_LMGA_on_git_graph("styleguide");
+//    LMG_vs_LMGA_on_git_graph("gitignore");
     return 0;
 }
