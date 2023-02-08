@@ -18,9 +18,9 @@ struct FibHeapNode {
 };
 
 ActiveForest::ActiveForest(CompressedTree<int> &_co)
-    : co(_co)
-    , active_edge(co.size())
-    , active_sets(co.size())
+        : co(_co)
+        , active_edge(co.size())
+        , active_sets(co.size())
 {
 }
 

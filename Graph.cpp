@@ -56,15 +56,12 @@ IntGraph::IntGraph(const vector<tuple<int,int>>& vertices, const vector<tuple<in
 IntGraph::IntGraph(const vector<tuple<int, int, edge_variables>>& edges) {
     make_node(0);
     for (auto e : edges) {
-        int& pred = get<0>(e);
-        int& succ = get<1>(e);
-        auto& costs = get<2>(e);
-        if (nodes.find(pred) == nodes.end())
-            make_node(pred);
-        if (nodes.find(succ) == nodes.end())
-            make_node(succ);
-        make_edge(pred, succ, costs);
+        int& u = get<0>(e);
+        int& v = get<1>(e);
+        auto& w = get<2>(e);
+        add_or_modify_edge(u, v, w, true);
     }
+    m = edges.size();
 }
 IntGraph::IntGraph(int node_count, float p, bool equal_weights) {
     // lambda
