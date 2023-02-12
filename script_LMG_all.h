@@ -23,6 +23,7 @@ void LMG_vs_LMGA_on_git_graph(string name) {
 //    graph_file.open(graph_name);
 //    output_file.open(output_name);
     auto G = read_graph(graph_file);
+    cout << G.is_legit() << endl;
     auto M = MST(G);
     int S_min = M.get_total_storage_cost();
 

@@ -6,6 +6,7 @@
 #include "unordered_map"
 #include "map"
 #include "MST/gabow.h"
+#include "MST/tarjan_pq.h"
 #include <iostream>
 using std::unordered_set;
 using std::unordered_map;
@@ -114,6 +115,8 @@ public:
      */
     void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
                                       unordered_map<int, int>& retrieval_cost) const;
+
+    bool is_legit();///< checks if there is a 0, whether 0 is connected to all other nodes, and whether there are self-loops.
 
     // Modifiers //
     /**

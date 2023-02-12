@@ -46,6 +46,8 @@ IntGraph LMG(const IntGraph& G, int S) {
                                          return x.second < y.second;
                                      }); // this is argmax in c++...
         int candidate = iter->first; // vertex to materialize
+        if (iter->second <= 0)// No possible improvements
+            break;
 
         // 2. Modify dependency
         int dependency_reduction = dependency_count[candidate], retrieval_reduction = retrieval_cost[candidate];
@@ -98,12 +100,12 @@ IntGraph LMG_all(const IntGraph& G, int S) {
     unordered_map<int, int> retrieval_cost;
     H.get_dependency_list_and_retrieval_cost(dependency_set, retrieval_cost);
 
-    unordered_set<int> active_edges; // The set of nodes that are not materialized, and that our budget allows for materialization.
+    unordered_set<int> active_edges; // The set of edges that our budget allows for materialization.
     auto edges = G.get_edges(true);
     for (auto i = 0; i < edges.size(); i++) {
-        auto &[u, v, w] = edges[i];
+        auto [u, v, w] = edges[i];
         auto pred = H.get_in_neighbors_of(v, true)[0];
-        if (pred != u and w.storage - H[pred][v].storage <= storage_surplus) {
+        if (pred != u and w.storage - G[pred][v].storage <= storage_surplus) {
             active_edges.insert(i);
         }
     }
@@ -132,28 +134,27 @@ IntGraph LMG_all(const IntGraph& G, int S) {
                                          return x.second < y.second;
                                      }); // this is argmax in c++...
         auto &[u, v, w] = edges[iter->first]; // vertex to materialize
+        if (iter->second <= 0)// No possible improvements
+            break;
 
         // 2. Modify dependency
-        const auto &dependency_reduction = dependency_set[v];
+        const auto &dependency_removal = dependency_set[v];
         int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
-        if (retrieval_reduction <= 0) { // No possible improvements
-            break;
-        }
 
         int cur = H.get_in_neighbors_of(v, true)[0];
-        while (cur != 0) {
-            for (auto node : dependency_reduction)
+        while (cur != 0) { // removing dependency from v's original ancestors
+            for (auto node : dependency_removal)
                 dependency_set[cur].erase(node);
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
-        cur = u; // additional step of adding dependency to u's ancestors
+        cur = u; // adding dependency to u's ancestors
         while (cur != 0) {
-            dependency_set[cur].insert(dependency_reduction.begin(), dependency_reduction.end());
+            dependency_set[cur].insert(dependency_removal.begin(), dependency_removal.end());
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
 
         // 3. Modify retrieval
-        for (auto child : dependency_reduction) {
+        for (auto child : dependency_removal) {
             retrieval_cost[child] -= retrieval_reduction;
         }
 

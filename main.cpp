@@ -14,8 +14,8 @@ int main() {
 //    try_DP_on_rg();
 //    test_make_binary();
 
-    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");
-//    LMG_vs_LMGA_on_git_graph("styleguide");
+//    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");
+    LMG_vs_LMGA_on_git_graph("styleguide");
 //    LMG_vs_LMGA_on_git_graph("gitignore");
     return 0;
 }
