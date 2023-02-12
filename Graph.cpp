@@ -269,8 +269,7 @@ void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unorder
     // 1. Push element into stack in bfs order, and calculate their retrieval cost along the way.
     vector<int> stack{0};
     retrieval_cost[0] = 0;
-    // TODO: dependency of 0 is everyone? Necessary?
-    size_t ind = 0;
+    int ind = 0;
     while (ind < stack.size()) {
         auto children = get_out_neighbors_of(stack[ind]);
         for (auto child : children) {
@@ -282,7 +281,7 @@ void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unorder
 
     // 2. Go backwards in stack and note the number of descendents
     ind = stack.size() - 1;
-    while (ind > 0) {
+    while (ind >= 0) {
         auto &dep = dependency_list[stack[ind]];
         auto children = get_out_neighbors_of(stack[ind]);
         for (auto child : children) {
@@ -305,7 +304,7 @@ long long IntGraph::get_total_retrieval_cost() const {
     get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
     long long ans = 0;
     for (int v : nodes) {
-        ans += dependency_count[v] * retrieval_cost[v];
+        ans += retrieval_cost[v];
     }
     return ans;
 }

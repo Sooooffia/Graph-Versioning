@@ -37,7 +37,8 @@ void LMG_vs_LMGA_on_git_graph(string name) {
         auto end_LMGA = high_resolution_clock::now();
 
         output_file << sol_LMG.get_total_retrieval_cost() << " " << sol_LMGA.get_total_retrieval_cost() << " ";
-        output_file << duration_cast<microseconds>(end_LMG-start_LMG).count() << " " << duration_cast<microseconds>(end_LMGA-start_LMGA).count() << endl;
+        output_file << duration_cast<microseconds>(end_LMG-start_LMG).count() << " " << duration_cast<microseconds>(end_LMGA-start_LMGA).count();
+        output_file << " " << S_min*beta << endl;
     }
     graph_file.close();
     output_file.close();

@@ -103,77 +103,80 @@ IntGraph LMG_all(const IntGraph& G, int S) {
     unordered_set<int> active_edges; // The set of edges that our budget allows for materialization.
     auto edges = G.get_edges(true);
     for (auto i = 0; i < edges.size(); i++) {
-        auto [u, v, w] = edges[i];
+        const auto &[u, v, w] = edges[i];
         auto pred = H.get_in_neighbors_of(v, true)[0];
-        if (pred != u and w.storage - G[pred][v].storage <= storage_surplus) {
+        int storage_increase = w.storage - H[pred][v].storage;
+        if (pred != u and storage_increase <= storage_surplus) {
             active_edges.insert(i);
         }
     }
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_edges.empty()) {
-        cout << active_edges.size() << " edges left ";
+//        cout << active_edges.size() << " edges left ";
         // 1. Calculate rho for all active nodes and find maximum
         map<int, double> rho; // For each i, rho[i] is the value over cost of replacing some edge with edge i.
         for (auto i : active_edges) {
             auto &[u, v, w] = edges[i];
             auto pred = H.get_in_neighbors_of(v, true)[0];
-            int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
+            int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval),
+                storage_increase = w.storage - G[pred][v].storage;
             // The storage budget SHOULD allow for adding (u,v).
             if (retrieval_reduction <= 0 or dependency_set[v].find(u) != dependency_set[v].end() ) { // if (u,v) forms a cycle or retrieval does not decrease
-                rho[i] = -1;
-            } else if (G[0][v].storage <= G[pred][v].storage) {
+                rho[i] = INT32_MIN;
+            } else if (storage_increase <= 0) {
                 rho[i] = std::numeric_limits<double>::infinity();
             } else {
-                rho[i] = (double) dependency_set[v].size() * retrieval_reduction
-                         / (G[0][v].storage - G[pred][v].storage);
+                rho[i] = double(dependency_set[v].size()) * retrieval_reduction
+                         / storage_increase;
             }
         }
         auto iter = std::max_element(rho.begin(), rho.end(),
                                      [](const auto &x, const auto &y) {
                                          return x.second < y.second;
                                      }); // this is argmax in c++...
-        auto &[u, v, w] = edges[iter->first]; // vertex to materialize
+        const auto &[u, v, w] = edges[iter->first]; // vertex to materialize
         if (iter->second <= 0)// No possible improvements
             break;
 
         // 2. Modify dependency
-        const auto &dependency_removal = dependency_set[v];
+        const auto &dependency_reduction = dependency_set[v];
         int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
+        if (retrieval_reduction <= 0) { // No possible improvements
+            break;
+        }
 
         int cur = H.get_in_neighbors_of(v, true)[0];
-        while (cur != 0) { // removing dependency from v's original ancestors
-            for (auto node : dependency_removal)
+        while (cur != 0) {
+            for (auto node : dependency_reduction)
                 dependency_set[cur].erase(node);
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
         cur = u; // adding dependency to u's ancestors
         while (cur != 0) {
-            dependency_set[cur].insert(dependency_removal.begin(), dependency_removal.end());
+            dependency_set[cur].insert(dependency_reduction.begin(), dependency_reduction.end());
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
 
         // 3. Modify retrieval
-        for (auto child : dependency_removal) {
+        for (auto child : dependency_reduction) {
             retrieval_cost[child] -= retrieval_reduction;
         }
 
         // 4. Update the graph and active nodes
-        cout << H.get_total_retrieval_cost() << std::endl;
+
         int pred = H.get_in_neighbors_of(v, true)[0];
         storage_surplus -= w.storage - H[pred][v].storage;
         H.delete_edge(pred, v);
         H.add_or_modify_edge(u, v, w);
         active_edges.erase(iter->first);
-        rho.erase(iter->first);
         for (auto i = 0; i < edges.size(); i++) {
             if (active_edges.find(i) == active_edges.end())
                 continue;
-            auto &[u, v, w] = edges[i];
+            const auto &[u, v, w] = edges[i];
             auto pred = H.get_in_neighbors_of(v, true)[0];
             if (w.storage - H[pred][v].storage > storage_surplus) {
                 active_edges.erase(i);
-                rho.erase(iter->first);
             }
         }
     }

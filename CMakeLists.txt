@@ -3,7 +3,7 @@ project(Graph-Versioning)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3")
-add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.cpp test_DP.h script_LMG_all.h MST/dsu.cpp MST/gabow.cpp MST/active_forest.cpp)
+add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp GraphIO.h DP.cpp test_DP.h script_LMG_all.h MST/dsu.cpp MST/gabow.cpp MST/active_forest.cpp)
 
 #TODO: try find_library if everything else works
 #find_library(Gurobi_c++ NAMES libgurobi_c++.a libgurobi100.dylib PATH /Library/gurobi1000/macos_universal2/src/build
@@ -16,15 +16,24 @@ add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp OPT.cpp GraphIO.h DP.
 #target_link_libraries(Graph-Versioning ${Gurobi_c++})
 
 #TODO: This is for Bob's mac.
-#find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi100.dylib" HINTS "/Library/gurobi1000/macos_universal2/src/build"
-#        "/Library/gurobi1000/macos_universal2/lib")
-#target_link_libraries(Graph-Versioning GUROBI_LIB)
-target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/src/build/libgurobi_c++.a)
-target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi100.dylib)
-target_include_directories(Graph-Versioning PUBLIC /Library/gurobi1000/macos_universal2/include)
+##find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi100.dylib" HINTS "/Library/gurobi1000/macos_universal2/src/build"
+##        "/Library/gurobi1000/macos_universal2/lib")
+##target_link_libraries(Graph-Versioning GUROBI_LIB)
+#target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/src/build/libgurobi_c++.a)
+#target_link_libraries(Graph-Versioning /Library/gurobi1000/macos_universal2/lib/libgurobi100.dylib)
+#target_include_directories(Graph-Versioning PUBLIC /Library/gurobi1000/macos_universal2/include)
+#
+#add_subdirectory(MST)
+#OPTION (USE_OpenMP "Use OpenMP to enamble <omp.h>" ON)
 
-add_subdirectory(MST)
-OPTION (USE_OpenMP "Use OpenMP to enamble <omp.h>" ON)
+#TODO: This is for Sofia's PC.
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/src/build/gurobi_c++mt.lib)
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++md2017.lib)
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mdd2017.lib)
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mt2017.lib)
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mtd2017.lib)
+target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi100.lib)
+target_include_directories(Graph-Versioning PUBLIC C:/gurobi1000/win64/include)
 
 #TODO: figure out what this does. (this is from the MST library)
 #if(APPLE AND USE_OpenMP)
