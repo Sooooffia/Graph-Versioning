@@ -310,14 +310,15 @@ long long IntGraph::get_total_retrieval_cost() const {
 }
 vector<int> IntGraph::get_nodes_in_topo_order(int r) const {//TODO: not tested
     vector<int> pq{r};
-    bool visited[n+1]; // initially false
+    bool visited[this->size(true)]; // initially false
     memset(visited, 0, sizeof(visited));
     int ind = 0;
     while (ind < pq.size()) {
-        for (int child : get_out_neighbors_of(pq[ind])) if (!visited[child]) {
-            pq.push_back(child);
-            visited[child] = true;
-        }
+        for (int child : get_out_neighbors_of(pq[ind]))
+            if (not visited[child]) {
+                pq.push_back(child);
+                visited[child] = true;
+            }
         ind++;
     }
     return pq;

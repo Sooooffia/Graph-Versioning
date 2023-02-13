@@ -76,13 +76,11 @@ IntGraph LMG(const IntGraph& G, int S) {
         H.delete_edge(pred, candidate);
         H.add_or_modify_edge(0, candidate, G[0][candidate]);
         active_nodes.erase(candidate);
-        rho.erase(candidate);
         for (auto v : H.get_nodes(false)) {
             if (active_nodes.find(v) == active_nodes.end())
                 continue;
             if (G[0][v].storage - H[pred][v].storage > storage_surplus) {
                 active_nodes.erase(v);
-                rho.erase(v);
             }
         }
     }

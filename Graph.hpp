@@ -8,6 +8,8 @@
 #include "MST/gabow.h"
 #include "MST/tarjan_pq.h"
 #include <iostream>
+#include <cmath>
+
 using std::unordered_set;
 using std::unordered_map;
 using std::vector;
@@ -16,6 +18,11 @@ using std::invalid_argument;
 using std::logic_error;
 using std::istream;
 using std::ostream;
+using std::cout;
+using std::map;
+using std::get;
+using std::endl;
+using std::pair;
 
 struct edge_variables{
     int storage = 0;

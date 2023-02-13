@@ -12,9 +12,9 @@
 using std::string;
 using namespace std::chrono;
 
-void LMG_vs_LMGA_on_git_graph(string name) {
+void LMG_vs_LMGA_on_git_graph(const string& name) {
     string graph_name = "../Experiments/" + name + "-cpp.txt";
-    string output_name = "../Experiments/" + name + "-output.csv";
+    string output_name = "../Experiments/" + name + "-LMGA-output.csv";
     ifstream graph_file(graph_name);
     ofstream output_file(output_name);
     if (!graph_file.is_open())
@@ -23,7 +23,6 @@ void LMG_vs_LMGA_on_git_graph(string name) {
 //    graph_file.open(graph_name);
 //    output_file.open(output_name);
     auto G = read_graph(graph_file);
-    cout << G.is_legit() << endl;
     auto M = MST(G);
     int S_min = M.get_total_storage_cost();
 

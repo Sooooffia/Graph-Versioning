@@ -13,8 +13,10 @@ int main() {
 //    try_DP_on_rg();
 //    test_make_binary();
 
-    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");
-    LMG_vs_LMGA_on_git_graph("styleguide");
-    LMG_vs_LMGA_on_git_graph("gitignore");
+//    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");
+//    LMG_vs_LMGA_on_git_graph("styleguide");
+//    LMG_vs_LMGA_on_git_graph("gitignore");
+
+    test_DP_on_git_graph("styleguide", 0.1);
     return 0;
 }

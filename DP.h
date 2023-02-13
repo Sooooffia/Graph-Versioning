@@ -10,7 +10,7 @@ IntGraph make_binary(const IntGraph &G, int r);
  */
 int DP_arborescence(IntGraph &G, int r, double l, int S, int R_of_MST);
 
-/// Optimized variant of the DP, where we use state tuples instead of high dimensional arrays.
-int DP_arb_modified(IntGraph &G, int r, double l, int S, int R_of_MST);
+/// Trying geometric discretization.
+map<int, edge_variables, std::greater<int>> DP_arb_modified(IntGraph &G, int r, double epsilon, int S, int R_of_MST);
 
 #endif //GRAPH_VERSIONING_DP_H
