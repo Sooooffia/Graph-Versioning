@@ -247,15 +247,15 @@ map<int, edge_variables, std::greater<int>> DP_arb_modified(IntGraph &G, int r, 
     // count number of possible descendents
 //    unordered_map<int, int> desc_count = get_descendants_of_arb(G, r);
 //    std::cout << "desc_count: " << desc_count << std::endl;
-    for (auto v : nodes) {
+    for (const auto& v : nodes) {
         if (G.get_out_neighbors_of(v).size() == 0) {
             DP[v][1][0] = OPT[v][0] = {G[0][v].storage, 0};
         }
     }
 
-    for (auto v : nodes) {
+    for (const auto& v : nodes) {
         cout << "\nrecursion on node " << v << std::endl;
-        auto out_edges = G.get_out_edges_of(v);
+        const auto& out_edges = G.get_out_edges_of(v);
         // One child
         if (out_edges.size() == 1) {
             int child = out_edges.begin()->first;
@@ -263,7 +263,7 @@ map<int, edge_variables, std::greater<int>> DP_arb_modified(IntGraph &G, int r, 
             int matv = G[0][v].storage, mat = G[0][child].storage;
 
             // k = 1 case
-            for (auto pt : OPT[child]) {
+            for (const auto& pt : OPT[child]) {
                 int new_s = pt.second.storage + matv;
                 if (new_s > S)
                     continue;
@@ -271,8 +271,8 @@ map<int, edge_variables, std::greater<int>> DP_arb_modified(IntGraph &G, int r, 
             }
 
             // k > 1 case
-            for (auto pk : DP[child]) {
-                for (auto pt : pk.second) {
+            for (const auto& pk : DP[child]) {
+                for (const auto& pt : pk.second) {
                     edge_variables new_pair = {sto - mat + pt.second.storage + matv, pt.second.retrieval + ret * pk.first};
                     int new_k = pk.first + 1, new_t = getmetrically_discretize(new_pair.retrieval, epsilon);
                     if (new_pair.storage > S)
@@ -348,8 +348,8 @@ map<int, edge_variables, std::greater<int>> DP_arb_modified(IntGraph &G, int r, 
             }
         }
         // calculate OPT
-        for (auto &pk : DP[v]) {
-            for (auto &pt : pk.second) {
+        for (const auto &pk : DP[v]) {
+            for (const auto &pt : pk.second) {
                 update_OPT(OPT[v], pt.first, pt.second);
             }
         }

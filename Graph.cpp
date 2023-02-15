@@ -125,14 +125,14 @@ unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v,bool aux) con
     }
     return output;
 }
-unordered_map<int, edge_variables> IntGraph::get_out_edges_of(int v) const {
+const unordered_map<int, edge_variables>& IntGraph::get_out_edges_of(int v) const {
     return outNeighbors.at(v);
 }
 vector<tuple<int, int, edge_variables>> IntGraph::get_edges(bool aux) const {
     vector<tuple<int, int, edge_variables>> output;
     auto valid_nodes = get_nodes(aux);
 
-    for (auto u : valid_nodes){
+    for (const auto& u : valid_nodes){
         for (const auto& e : outNeighbors.at(u)){
             int v = get<0>(e);
             edge_variables costs = get<1>(e);
@@ -321,7 +321,7 @@ vector<int> IntGraph::get_nodes_in_topo_order(int r) const {//TODO: not tested
             }
         ind++;
     }
-    return pq;
+    return std::move(pq);
 }
 IntGraph MST(const IntGraph& G) {
     auto edges = G.get_edges(true);
