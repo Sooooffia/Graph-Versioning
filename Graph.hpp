@@ -107,7 +107,7 @@ public:
     unordered_map<int, edge_variables> operator[](int) const;
     [[nodiscard]] long long get_total_storage_cost() const;
     [[nodiscard]] long long get_total_retrieval_cost() const;
-    [[nodiscard]] vector<int> get_nodes_in_topo_order(int r) const;///< Not including 0. Assuming there is no cycle!
+    [[nodiscard]] vector<int> get_nodes_in_bfs_order(int r) const;///< Not including 0. Assuming there is no cycle!
     /**
      * @note The graph must be an arborescence rooted at 0!
      * @param dependency_count: int -> int. dependency_count[v] is the number of dependent nodes of v in H, including v itself.
