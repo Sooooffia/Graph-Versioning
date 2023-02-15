@@ -15,12 +15,12 @@ add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp GraphIO.h DP.cpp test
 #endif()
 #target_link_libraries(Graph-Versioning ${Gurobi_c++})
 # This is for Pat's mac.
-#find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi95.dylib" HINTS "/Library/gurobi951/macos_universal2/src/build"
-        #"/Library/gurobi951/macos_universal2/lib")
-#target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/src/build)
-#target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/src/build/libgurobi_c++.a)
-#target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/lib/libgurobi95.dylib)
-#target_include_directories(Graph-Versioning PUBLIC /Library/gurobi951/macos_universal2/include)
+find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi95.dylib" HINTS "/Library/gurobi951/macos_universal2/src/build"
+        "/Library/gurobi951/macos_universal2/lib")
+target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/src/build)
+target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/src/build/libgurobi_c++.a)
+target_link_libraries(Graph-Versioning /Library/gurobi951/macos_universal2/lib/libgurobi95.dylib)
+target_include_directories(Graph-Versioning PUBLIC /Library/gurobi951/macos_universal2/include)
 
 #TODO: This is for Bob's mac.
 ##find_library(GUROBI_LIB NAMES "libgurobi_c++.a" "libgurobi100.dylib" HINTS "/Library/gurobi1000/macos_universal2/src/build"
@@ -34,13 +34,13 @@ add_executable(Graph-Versioning main.cpp Graph.cpp LMG.cpp GraphIO.h DP.cpp test
 #OPTION (USE_OpenMP "Use OpenMP to enamble <omp.h>" ON)
 
 #TODO: This is for Sofia's PC.
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/src/build/gurobi_c++mt.lib)
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++md2017.lib)
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mdd2017.lib)
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mt2017.lib)
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mtd2017.lib)
-target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi100.lib)
-target_include_directories(Graph-Versioning PUBLIC C:/gurobi1000/win64/include)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/src/build/gurobi_c++mt.lib)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++md2017.lib)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mdd2017.lib)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mt2017.lib)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi_c++mtd2017.lib)
+#target_link_libraries(Graph-Versioning C:/gurobi1000/win64/lib/gurobi100.lib)
+#target_include_directories(Graph-Versioning PUBLIC C:/gurobi1000/win64/include)
 
 #TODO: figure out what this does. (this is from the MST library)
 #if(APPLE AND USE_OpenMP)
