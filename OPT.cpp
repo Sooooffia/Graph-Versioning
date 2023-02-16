@@ -2,14 +2,14 @@
 #include <iostream>
 #include <sstream>
 using std::ostringstream;
-IntGraph prob3_ILP(const IntGraph &G, int S) {
+double prob3_ILP(const IntGraph &G, int S) {
     auto edges = G.get_edges(true);
     vector<tuple<int, int, edge_variables>> Soln_edges;
     try {
         // Create an environment
         GRBEnv env = GRBEnv(true);
         env.set("LogFile", "prob3_ILP.log");
-        env.set("LogToConsole", "0");
+        env.set("LogToConsole", "1");
         env.start();
 
         // Create an empty model
@@ -49,15 +49,17 @@ IntGraph prob3_ILP(const IntGraph &G, int S) {
         // Optimize model
         model.optimize();
 
-        for (auto &[u, v, w]: edges) {
-            if (I[u][v].get(GRB_DoubleAttr_X) > 0)
-                Soln_edges.emplace_back(u, v, w);
-        }
+//        for (auto &[u, v, w]: edges) {
+//            if (I[u][v].get(GRB_DoubleAttr_X) > 0)
+//                Soln_edges.emplace_back(u, v, w);
+//        }
+        return model.get(GRB_DoubleAttr_ObjVal);
     } catch(GRBException &e) {
         cout << "Error code = " << e.getErrorCode() << endl;
         cout << "Error message:" << e.getMessage() << endl;
     } catch(...) {
         cout << "Exception during optimization" << endl;
     }
-    return IntGraph(Soln_edges);
+//    return IntGraph(Soln_edges);
+    return -1;
 }

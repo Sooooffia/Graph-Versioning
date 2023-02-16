@@ -14,6 +14,6 @@ using namespace std;
  * @param S: int, stroage constraint.
  * @return Soln: a subgrpah of G consisted of the chosen edges. (including edges like (0,v))
  */
-IntGraph prob3_ILP(const IntGraph &G, int S);
+double prob3_ILP(const IntGraph &G, int S);
 
 #endif //GRAPH_VERSIONING_OPT_H

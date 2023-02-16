@@ -23,6 +23,7 @@ using std::map;
 using std::get;
 using std::endl;
 using std::pair;
+using std::priority_queue;
 
 struct edge_variables{
     int storage = 0;
@@ -100,7 +101,7 @@ public:
     [[nodiscard]] unordered_set<int> get_nodes(bool aux) const;///< @return A vector of all nodes. aux=true if wants 0.
     [[nodiscard]] vector<tuple<int, int>> get_nodes_and_storage(bool aux) const;///< @return a vector of tuple<int, int>, node number and storage cost.
     [[nodiscard]] unordered_map<int, edge_variables> get_in_edges_of(int v, bool aux) const;///< @param v: node. @return A map u -> weight(u,v), for all existing (u,v).
-    [[nodiscard]] const unordered_map<int, edge_variables>& get_out_edges_of(int) const;///< @param u: node. @return A map v -> weight(u,v), for all existing (u,v).
+    [[nodiscard]] const unordered_map<int, edge_variables> &get_out_edges_of(int) const;///< @param u: node. @return A map v -> weight(u,v), for all existing (u,v).
     [[nodiscard]] vector<tuple<int,int,edge_variables>> get_edges(bool aux) const;///< @return A vector of all edges, aux: whether to include auxilary root
     [[nodiscard]] vector<int> get_in_neighbors_of(int, bool aux) const;///< @return A vector of predecessors
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors

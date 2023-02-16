@@ -193,6 +193,9 @@ vector<int> IntGraph::add_node_with_storage(const vector<tuple<int, int>>& verti
     return output;
 }
 void IntGraph::add_or_modify_edge(int u, int v, edge_variables costs, bool new_node) {
+    if (u == 0 and v == 0) {
+        return;
+    }
     if (u == v) {
         throw invalid_argument("Self-loop error in add_or_modify_edge.");
     }
@@ -308,7 +311,7 @@ long long IntGraph::get_total_retrieval_cost() const {
     }
     return ans;
 }
-vector<int> IntGraph::get_nodes_in_topo_order(int r) const {//TODO: not tested
+vector<int> IntGraph::get_nodes_in_bfs_order(int r) const {//TODO: not tested
     vector<int> pq{r};
     bool visited[this->size(true)]; // initially false
     memset(visited, 0, sizeof(visited));

@@ -9,7 +9,7 @@
 IntGraph make_binary(const IntGraph &G, int r) {//TODO: not tested
     IntGraph H(G);
     int n = H.size(false);
-    for (auto v : H.get_nodes(false)) {
+    for (const auto &v : H.get_nodes(false)) {
         auto out_neighbors = H.get_out_neighbors_of(v);
         while (out_neighbors.size() > 2) { // start removing child of v.
             n++;
@@ -234,25 +234,19 @@ map<int, edge_variables, std::greater<>> DP_arb_modified(const IntGraph &G, int 
     auto edges = H.get_edges(false);
 
     int T = log_base_a_of_b(1+epsilon, R_of_MST);
-//    for (auto &[u,v,w]: H.get_edges(false)) {
-//        if (w.retrieval > 0)
-//           H.add_or_modify_edge(u, v, {w.storage, int(log_base_a_of_b(1+epsilon, w.retrieval-1) + 2)});
-//    }
 
     // 2. Base cases
     unordered_map<int, unordered_map<int, unordered_map<int, edge_variables>>> DP; ///<now we are storing a pair (s,r) of the subsolution.
     map<int, map<int, edge_variables, std::greater<>>> OPT; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
 
     // count number of possible descendents
-//    unordered_map<int, int> desc_count = get_descendants_of_arb(H, r);
-//    std::cout << "desc_count: " << desc_count << std::endl;
-    for (auto v : nodes) {
+    for (const auto &v : nodes) {
         if (H.get_out_neighbors_of(v).size() == 0) {
             DP[v][1][0] = OPT[v][0] = {H[0][v].storage, 0};
         }
     }
 
-    for (auto v : nodes) {
+    for (const auto &v : nodes) {
         cout << "\nrecursion on node " << v << std::endl;
         auto out_edges = H.get_out_edges_of(v);
         // One child
@@ -270,8 +264,8 @@ map<int, edge_variables, std::greater<>> DP_arb_modified(const IntGraph &G, int 
             }
 
             // k > 1 case
-            for (auto pk : DP[child]) {
-                for (auto pt : pk.second) {
+            for (const auto &pk : DP[child]) {
+                for (const auto &pt : pk.second) {
                     edge_variables new_pair = {sto - mat + pt.second.storage + matv, pt.second.retrieval + ret * pk.first};
                     int new_k = pk.first + 1, new_t = getmetrically_discretize(new_pair.retrieval, epsilon);
                     if (new_pair.storage > S)
@@ -347,8 +341,8 @@ map<int, edge_variables, std::greater<>> DP_arb_modified(const IntGraph &G, int 
             }
         }
         // calculate OPT
-        for (auto &pk : DP[v]) {
-            for (auto &pt : pk.second) {
+        for (const auto &pk : DP[v]) {
+            for (const auto &pt : pk.second) {
                 update_OPT(OPT[v], pt.first, pt.second);
             }
         }
@@ -361,7 +355,7 @@ map<int, edge_variables, std::greater<>> DP_arb_modified(const IntGraph &G, int 
  * @param r : the designated root.
  * @return pair {H, Arb} : H is a bidirectional tree, while Arb is an arborescence specifying the ancestry of nodes.
  */
-pair<IntGraph, IntGraph> make_binary_bidirectional(IntGraph &G, int r) {//TODO: test this
+pair<IntGraph, IntGraph> make_binary_bidirectional(const IntGraph &G, int r) {//TODO: test this
     IntGraph Arb = MST_with_designated_root(G, r); ///<This is for defining parent-child hierarchy.
     IntGraph H(G);
     int n = Arb.size(false);
@@ -399,39 +393,37 @@ pair<IntGraph, IntGraph> make_binary_bidirectional(IntGraph &G, int r) {//TODO: 
     return {H, Arb};
 }
 
-map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &G, const IntGraph &Arb, int r, double epsilon, int S, int R_of_MST) {
-    auto H = make_binary(G, r);
+map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &G, int r, double epsilon, int S, int R_of_MST) {
+    auto [H, Arb] = make_binary_bidirectional(G, r);
+    //TODO: change this
 
     // 1. Calculating parameters
     auto nodes = H.get_nodes_in_bfs_order(r);
     std::reverse(nodes.begin(), nodes.end());
     auto edges = H.get_edges(false);
-    int n = nodes.size();
-
-    int T = log_base_a_of_b(1+epsilon, R_of_MST);
 
     // 2. Base cases
-    unordered_map<int, unordered_map<int, unordered_map<int, edge_variables>>> DP; ///<now we are storing a pair (s,r) of the subsolution.
+    unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, edge_variables>>>> DP; ///<now we are storing a pair (s,r) of the subsolution.
     map<int, map<int, edge_variables, std::greater<>>> OPT; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
 
     // count number of possible descendents
     for (const auto &v : nodes) {
-        if (H.get_out_neighbors_of(v).size() == 0) {
-            DP[v][1][0] = OPT[v][0] = {H[0][v].storage, 0};
+        if (Arb.get_out_neighbors_of(v).empty()) {
+            DP[v][1][0][0] = OPT[v][0] = {H[0][v].storage, 0};
         }
     }
 
     for (const auto &v : nodes) {
-        cout << "\nrecursion on node " << v << std::endl;
-        auto out_edges = H.get_out_edges_of(v);
-        // One child
+        cout << "\nrecursion on node " << v << endl;
+        auto out_edges = Arb.get_out_edges_of(v);
+        /// One child
         if (out_edges.size() == 1) {
             int child = out_edges.begin()->first;
             int sto = out_edges.begin()->second.storage, ret = out_edges.begin()->second.retrieval;
             int matv = H[0][v].storage, mat = H[0][child].storage;
 
             // k = 1 case
-            for (auto pt : OPT[child]) {
+            for (const auto &pt : OPT[child]) {
                 int new_s = pt.second.storage + matv;
                 if (new_s > S)
                     continue;
@@ -439,8 +431,8 @@ map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &G, con
             }
 
             // k > 1 case
-            for (auto pk : DP[child]) {
-                for (auto pt : pk.second) {
+            for (const auto &pk : DP[child]) {
+                for (const auto &pt : pk.second) {
                     edge_variables new_pair = {sto - mat + pt.second.storage + matv, pt.second.retrieval + ret * pk.first};
                     int new_k = pk.first + 1, new_t = getmetrically_discretize(new_pair.retrieval, epsilon);
                     if (new_pair.storage > S)
@@ -448,9 +440,9 @@ map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &G, con
                     update_DP(DP[v][new_k], new_t, new_pair);
                 }
             }
-        }
+        }/// EndFor of onechild
 
-            // Two children
+        /// Two children
         else if (out_edges.size() == 2) {
             int child1 = out_edges.begin()->first, child2 = (++out_edges.begin())->first;
             int sto1 = out_edges.begin()->second.storage, ret1 = out_edges.begin()->second.retrieval,

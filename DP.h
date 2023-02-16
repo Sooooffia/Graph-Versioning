@@ -13,6 +13,6 @@ IntGraph make_binary(const IntGraph &G, int r);
 /// Trying geometric discretization.
 map<int, edge_variables, std::greater<>> DP_arb_modified(const IntGraph &H, int r, double epsilon, int S, int R_of_MST);
 
-map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &H, const IntGraph &Arb, int r, double epsilon, int S, int R_of_MST);
+map<int, edge_variables, std::greater<>> DP_bidirectional(const IntGraph &H, int r, double epsilon, int S, int R_of_MST);
 
 #endif //GRAPH_VERSIONING_DP_H
