@@ -29,6 +29,26 @@ void test_make_binary() {
 //    cout << M.get_total_retrieval_cost() << endl;
 //}
 
+//void test_DP_on_git_graph(const string &name, double epsilon) {
+//    string graph_name = "../Experiments/" + name + "-cpp.txt";
+//    string output_name = "../Experiments/" + name + "-DP-output.csv";
+//    ifstream graph_file(graph_name);
+//    ofstream output_file(output_name);
+//    if (!graph_file.is_open())
+//        throw logic_error("failed to open file\n");
+//
+//    auto G = read_graph(graph_file);
+//    auto M = MST(G);
+//    int S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+//    int r = G.size(false);
+//    IntGraph Arb = MST_with_designated_root(G, r);
+//
+//    auto ans = DP_arb_modified(Arb, r, epsilon, S_min * 2, R_of_MST);
+//    for (const auto &p : ans) {//TODO: check the rounding here as well.
+//        output_file << p.second.storage << " " << p.second.retrieval << " " << p.first << endl;
+//    }
+//}
+
 void test_DP_on_git_graph(const string &name, double epsilon) {
     string graph_name = "../Experiments/" + name + "-cpp.txt";
     string output_name = "../Experiments/" + name + "-DP-output.csv";
@@ -40,11 +60,20 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
     auto G = read_graph(graph_file);
     auto M = MST(G);
     int S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
-    IntGraph Arb = MST_with_designated_root(G, 1);
+    int r = 1;
+    IntGraph Arb = MST_with_designated_root(G, r);
+    IntGraph bidirectional_T;
+    for (const auto &[u,v,w] : Arb.get_edges(false)) {
+        bidirectional_T.add_or_modify_edge(u, v, w, true);
+        bidirectional_T.add_or_modify_edge(v, u, G[v][u], true);
+    }
+    for (const auto &v : G.get_nodes(false)) {
+        bidirectional_T.add_or_modify_edge(0, v, G[0][v], true);
+    }
 
-    auto ans = DP_arb_modified(Arb, 1, epsilon, S_min * 2, R_of_MST);
+    auto ans = DP_bidirectional(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
     for (const auto &p : ans) {//TODO: check the rounding here as well.
-        output_file << p.second.storage << " " << p.second.retrieval << " " << p.first << endl;
+        output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
     }
 }
 

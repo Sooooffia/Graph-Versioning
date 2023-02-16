@@ -367,18 +367,3 @@ IntGraph MST_with_designated_root(const IntGraph &G, int r) {//TODO: not tested
     }
     return H;
 }
-bool IntGraph::is_legit() {
-    if (nodes.find(0) == nodes.end())
-        return false;
-    for (auto v : get_nodes(false)) {
-        if (outNeighbors[0].find(v) == outNeighbors[0].end())
-            return false;
-        if (outNeighbors[0][v].retrieval != 0)
-            return false;
-    }
-    for (auto &[u,v,w] : get_edges(true)) {
-        if (u == v)
-            return false;
-    }
-    return true;
-}
