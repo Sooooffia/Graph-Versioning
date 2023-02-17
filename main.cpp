@@ -17,10 +17,12 @@ int main() {
 //    LMG_vs_LMGA_on_git_graph("styleguide"); // 493 nodes and 1250 edges
 //    LMG_vs_LMGA_on_git_graph("gitignore"); // 3526 nodes and 9856 edges
 
-    test_DP_on_git_graph("styleguide", 0.05);
+//    test_DP_on_git_graph("styleguide", 0.1);
+//    test_DP_on_git_graph("LeetCodeAnimation", 0.05);
+    test_DP_on_git_graph("gitignore", 0.05);
 
 //    test_OPT_on_git_grpah("LeetCodeAnimation");
 //    test_OPT_on_git_grpah("styleguide");
 //    test_OPT_on_git_grpah("gitignore");
-    return 0;
+return 0;
 }
