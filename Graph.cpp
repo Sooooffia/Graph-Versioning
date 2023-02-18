@@ -236,7 +236,7 @@ unordered_map<int, edge_variables> IntGraph::operator[](int u) const {
     return get_out_edges_of(u);
 }
 void IntGraph::get_dependency_count_and_retrieval_cost(unordered_map<int, int>& dependency_count,
-                                             unordered_map<int, int>& retrieval_cost) const {
+                                             unordered_map<int, long long>& retrieval_cost) const {
     for (auto v : get_nodes(false)) {
         dependency_count[v] = 1;
     }
@@ -265,7 +265,7 @@ void IntGraph::get_dependency_count_and_retrieval_cost(unordered_map<int, int>& 
     }
 }
 void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
-                                            unordered_map<int, int>& retrieval_cost) const {
+                                            unordered_map<int, long long>& retrieval_cost) const {
     for (auto v : get_nodes(false)) {
         dependency_list[v].insert(v);
     }
@@ -303,7 +303,7 @@ long long IntGraph::get_total_storage_cost() const {
 }
 long long IntGraph::get_total_retrieval_cost() const {
     unordered_map<int, int> dependency_count;
-    unordered_map<int, int> retrieval_cost;
+    unordered_map<int, long long> retrieval_cost;
     get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
     long long ans = 0;
     for (int v : nodes) {
@@ -326,6 +326,26 @@ vector<int> IntGraph::get_nodes_in_bfs_order(int r) const {//TODO: not tested
     }
     return std::move(pq);
 }
+
+long long IntGraph::get_max_storage_cost() const {
+    long long ans = 0;
+    for (const auto &v : get_nodes(false)) {
+        ans += outNeighbors.at(0).at(v).storage;
+    }
+    return ans;
+}
+
+long long IntGraph::get_max_retrieval_cost() const {
+    unordered_map<int, int> dependency_count;
+    unordered_map<int, long long> retrieval_cost;
+    get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
+    long long ans = INT64_MIN;
+    for (const auto &v : nodes) {
+        ans = std::max(ans, retrieval_cost[v]);
+    }
+    return ans;
+}
+
 IntGraph MST(const IntGraph& G) {
     auto edges = G.get_edges(true);
     auto m = edges.size();
@@ -366,4 +386,12 @@ IntGraph MST_with_designated_root(const IntGraph &G, int r) {//TODO: not tested
         H.add_or_modify_edge(0, v, G[0][v]);
     }
     return H;
+}
+
+IntGraph Symmetric_MST_with_min_weight(const IntGraph &G) {//TODO: this may improve the choice of tree.
+    IntGraph GG;
+//    for (const auto &[u,v,w] : G.get_edges(false)) {
+//        GG.add_or_modify_edge()
+//    }
+    return GG;
 }

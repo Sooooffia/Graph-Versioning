@@ -2,27 +2,27 @@
 #define GRAPH_VERSIONING_PROB6_H
 #include "Graph.hpp"
 
-struct cmp {
-    bool operator()(const tuple<int,int>& a, const tuple<int,int>& b) const{
-        return get<1>(a) < get<1>(b);
-    }
-};
 IntGraph Modified_Prim(const IntGraph &G, int R) {
-    priority_queue<tuple<int, int>, vector<tuple<int,int>>, cmp> PQ;
-    PQ.push({0,0});
-    unordered_map<int, int> p;
-    vector<int> d(G.size(false), INT32_MAX), l(G.size(false), INT32_MAX);
+    int n = G.size(false);
+
+    vector<int> p(n+1);
+    vector<long long> d(n+1, INT32_MAX), l(n+1, INT32_MAX);
     p[0] = d[0] = l[0] = 0;
-    unordered_set<int> X;
+    auto cmp = [&l](const int &a, const int &b) {
+        return l[a] < l[b];
+    };
+    set<int, decltype(cmp)> PQ(cmp);
+    PQ.insert(0);
 
     IntGraph ans;
     while (not PQ.empty()) {
-        auto [i, li] = PQ.top(); PQ.pop();
-        ans.add_or_modify_edge(i, p[i]);
+        int i = *(PQ.begin());
+        PQ.erase(PQ.begin());
         if (i != 0)
-            X.insert(i);
-        for (const int &j : G.get_out_neighbors_of(i)) {
-            if (X.find(i) != X.end()) {
+            ans.add_or_modify_edge(p[i], i, G[p[i]][i], true);
+        for (auto j : G.get_out_neighbors_of(i)) {
+            auto nodes = ans.get_nodes(false);
+            if (nodes.find(j) != nodes.end()) {
                 if (G[i][j].retrieval + d[i] <= d[j] and G[i][j].storage <= l[j]) {
                     ans.delete_edge(p[j], j);
                     p[j] = i;
@@ -34,67 +34,68 @@ IntGraph Modified_Prim(const IntGraph &G, int R) {
                 d[j] = d[i] + G[i][j].retrieval;
                 l[j] = G[i][j].storage;
                 p[j] = i;
-                PQ.push({j, l[j]});
+                PQ.insert(j);
             }
         }
     }
     return ans;
 }
 
-unordered_map<int, unordered_map<int, unordered_set<int>>> all_pair_Dijkstra_paths(const IntGraph &G, int cutoff = INT32_MAX) {
+long long DP_BMR(const IntGraph &G, long long R) {
     int n = G.size(false);
-    vector<int> nodes = G.get_nodes_in_bfs_order(false);
-    vector<vector<int>> dist(n+1, vector<int>(n+1, INT32_MAX));
-    vector<vector<int>> pred(n+1, vector<int>(n+1, -1));
-    unordered_map<int, unordered_map<int, unordered_set<int>>> path;
-    for (int i = 1; i <= n; i++) {// i is the current source
-        unordered_set<int> active_nodes(nodes.begin(), nodes.end());
-        while (not active_nodes.empty()) {
-            int v = -1, mindist = INT32_MAX;
-            for (const auto &j : active_nodes) if (mindist > dist[i][j]) {
-                    mindist = dist[i][j];
-                    v = j;
-                }
-
-            active_nodes.erase(v);
-            for (const auto &u : G.get_out_neighbors_of(v))
-                if (active_nodes.find(u) != active_nodes.end()) {
-                    int newdist = dist[i][u] + G[v][u].retrieval;
-                    if (dist[i][v] > newdist) {
-                        dist[i][v] = newdist;
-                        pred[i][v] = u;
-                    }
-                }
-        }
-
-        for (int v = 1; v <= n; v ++) {
-            if (dist[i][v] > cutoff)
-                continue;
-            int u = v;
-            while (u != i) {
-                path[i][v].insert(u);
-                u = pred[i][u];
-            }
-        }
-    }
-    return path;
-}
-
-int DP_BMR(const IntGraph &G, int R) {
-    int n = G.size(false);
-    vector<vector<int>> DP(n+1, vector<int>(n+1, INT32_MAX));
-    vector<int> OPT(G.size(true), INT32_MAX);
-    vector<int> nodes = G.get_nodes_in_bfs_order(false);
-    auto paths = all_pair_Dijkstra_paths(G, R);
+    vector<vector<long long>> DP(n+1, vector<long long>(n+1, INT64_MAX));
+    vector<long long> OPT(G.size(true), INT64_MAX);
+    IntGraph H = MST_with_designated_root(G, 1); // hierarchy
+    vector<int> nodes = H.get_nodes_in_bfs_order(1);
+    std::reverse(nodes.begin(), nodes.end());
 
     for (const auto &v : nodes) {
+        //paths and distances, for each source u with target v.
+        vector<long long> dist(n+1, INT64_MAX); // dist[u] is the distance from u to v.
+        unordered_map<int, vector<int>> paths; // nodes traversed going from u to v, in BACKWARDS order. (namely, paths[u][0]=v for all u)
+        vector<int> pq = {v};
+        vector<bool>visited(n+1, false);
+        int ind = 0;
+        dist[v] = 0;
+        visited[v] = true;
+        paths[v].push_back(v);
+
+        while (ind < pq.size()) {
+            int u = pq[ind];
+            for (const auto &child : G.get_out_neighbors_of(u)) {
+                if (not visited[child]) {
+                    visited[child] = true;
+                    dist[child] = dist[u] + G[child][u].retrieval;
+                    paths[child] = paths[u]; // copy?
+                    paths[child].push_back(child);
+                    pq.push_back(child);
+                }
+            }
+            ind++;
+        }
+
+        // recursion
         for (const auto &u : nodes) {
-            if (paths[u].find(v) == paths[u].end())
+            if (dist[u] > R)
                 continue;
-            int sum = 0;
-            //TODO: finish this
+            long long sum = 0;
+            for (const auto &w : H.get_out_neighbors_of(v)) {
+                if (u != v and paths[u][1] == w) // if w is in the path from u to v
+                    sum += DP[w][u];
+                else
+                    sum += std::min(DP[w][u], OPT[w]);
+            }
+            if (u == v)
+                sum += G[0][v].storage;
+            else
+                sum += G[paths[u][1]][v].storage;
+
+            DP[v][u] = sum;
+            if (v == 1 or v == u or paths[u][1] != H.get_in_neighbors_of(v,false)[0])
+                OPT[v] = std::min(OPT[v], sum);
         }
     }
+    return OPT[1];
 }
 
 #endif //GRAPH_VERSIONING_PROB6_H

@@ -9,8 +9,10 @@
 #include "MST/tarjan_pq.h"
 #include <iostream>
 #include <cmath>
+#include <cstring>
 
 using std::unordered_set;
+using std::set;
 using std::unordered_map;
 using std::vector;
 using std::tuple;
@@ -24,6 +26,7 @@ using std::get;
 using std::endl;
 using std::pair;
 using std::priority_queue;
+using std::string;
 
 struct edge_variables{
     int storage = 0;
@@ -107,7 +110,9 @@ public:
     [[nodiscard]] vector<int> get_out_neighbors_of(int) const;///< @return A vector of successors
     unordered_map<int, edge_variables> operator[](int) const;
     [[nodiscard]] long long get_total_storage_cost() const;
+    [[nodiscard]] long long get_max_storage_cost() const;
     [[nodiscard]] long long get_total_retrieval_cost() const;
+    [[nodiscard]] long long get_max_retrieval_cost() const;
     [[nodiscard]] vector<int> get_nodes_in_bfs_order(int r) const;///< Not including 0. Assuming there is no cycle!
     /**
      * @note The graph must be an arborescence rooted at 0!
@@ -115,14 +120,14 @@ public:
      * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
      */
     void get_dependency_count_and_retrieval_cost(unordered_map<int, int>& dependency_count,
-                                  unordered_map<int, int>& retrieval_cost) const;
+                                  unordered_map<int, long long>& retrieval_cost) const;
     /**
      * @note The graph must be an arborescence rooted at 0!
      * @param dependency_count: int -> set<int>. dependency_count[v] is the set of dependent nodes of v in H, including v itself.
      * @param retrieval_cost: int -> int. The retrieval cost of each v in H.
      */
     void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
-                                      unordered_map<int, int>& retrieval_cost) const;
+                                      unordered_map<int, long long>& retrieval_cost) const;
 
     // Modifiers //
     /**
@@ -172,6 +177,12 @@ IntGraph MST(const IntGraph& G);
  * This should be useful for heuristics. (extracting arborescence from
  */
 IntGraph MST_with_designated_root(const IntGraph &G, int r);
+
+/**
+ * @param G : directed graph.
+ * @return A bidirectional tree T. The edges of T form a MST for the undirected graph G', where G'[u][v] = min{G[u][v], G[v][u]}
+ */
+IntGraph Symmetric_MST_with_min_weight(const IntGraph &G, int r);
 
 // Outputting a vector like python list
 template <typename T>

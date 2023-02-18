@@ -3,6 +3,8 @@
 
 #include "tests.hpp"
 #include "GraphIO.h"
+#include <chrono>
+using namespace std::chrono;
 
 void test_make_binary() {
     IntGraph G(5);
@@ -59,7 +61,8 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
 
     auto G = read_graph(graph_file);
     auto M = MST(G);
-    int S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+    long long S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+
     int r = 1;
     IntGraph Arb = MST_with_designated_root(G, r);
     IntGraph bidirectional_T;
@@ -71,10 +74,14 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
         bidirectional_T.add_or_modify_edge(0, v, G[0][v], true);
     }
 
+    auto start_DP = high_resolution_clock::now();
     auto ans = DP_bidirectional(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
+    auto end_DP = high_resolution_clock::now();
+
     for (const auto &p : ans) {//TODO: check the rounding here as well.
         output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
     }
+    output_file << "time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
 }
 
 
