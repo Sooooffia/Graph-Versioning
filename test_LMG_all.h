@@ -4,12 +4,10 @@
 
 #ifndef GRAPH_VERSIONING_TEST_LMG_ALL_H
 #define GRAPH_VERSIONING_TEST_LMG_ALL_H
-#include <cstring>
 #include "GraphIO.h"
 #include "Graph.hpp"
 #include <chrono>
 using namespace std::chrono;
-using std::string;
 
 
 void LMG_vs_LMGA_on_git_graph(const string& name) {
@@ -23,10 +21,9 @@ void LMG_vs_LMGA_on_git_graph(const string& name) {
     auto G = read_graph(graph_file);
     cout << "G has " << G.size(false) << " nodes and " << G.get_edges(false).size() << " edges" << endl;
     auto M = MST(G);
-//    auto M2 = MST_TarjanPQ(G);
-    int S_min = M.get_total_storage_cost();
-//    cout << M.get_total_retrieval_cost() << " " << M2.get_total_retrieval_cost() << endl;
+    long long S_min = M.get_total_storage_cost();
 
+    output_file << "LMG solution,LMG-All solution,LMG time,LMG-All time,storage constraint" << endl;
     for (double beta = 1; beta < 2; beta += 0.05) {
         auto start_LMG = high_resolution_clock::now();
         auto sol_LMG = LMG(G, S_min*beta);

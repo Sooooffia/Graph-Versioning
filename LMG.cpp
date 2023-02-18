@@ -14,7 +14,7 @@ IntGraph LMG(const IntGraph& G, int S) {
 
     /// Initializing dependency, retrieval, and active nodes
     unordered_map<int, int> dependency_count;
-    unordered_map<int, int> retrieval_cost;
+    unordered_map<int, long long> retrieval_cost;
 
     H.get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
 
@@ -95,7 +95,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
 
     /// Initializing dependency, retrieval, and active nodes
     unordered_map<int, unordered_set<int>> dependency_set;
-    unordered_map<int, int> retrieval_cost;
+    unordered_map<int, long long> retrieval_cost;
     H.get_dependency_list_and_retrieval_cost(dependency_set, retrieval_cost);
 
     unordered_set<int> active_edges; // The set of edges that our budget allows for materialization.

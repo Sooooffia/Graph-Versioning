@@ -61,7 +61,8 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
 
     auto G = read_graph(graph_file);
     auto M = MST(G);
-    int S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+    long long S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+
     int r = 1;
     IntGraph Arb = MST_with_designated_root(G, r);
     IntGraph bidirectional_T;
