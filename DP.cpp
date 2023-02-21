@@ -37,7 +37,7 @@ double log_base_a_of_b(double a, double b) {
 }
 
 int geometrically_discretize(long long val, double epsilon) {
-    return int(log_base_a_of_b(1+epsilon, val-1) + 2);
+    return int(log_base_a_of_b(1+epsilon, val+1) + 2);
 }
 
 void update_DP(unordered_map<int, edge_variables> &t_map, int t, const edge_variables &new_val) {
@@ -49,8 +49,6 @@ void update_DP(unordered_map<int, edge_variables> &t_map, int t, const edge_vari
 }
 
 void update_DP(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val) {
-    if (new_val.storage < 0 or new_val.retrieval < 0)
-        throw logic_error("Aghhhhhhh");
     if (t_map.find(t) == t_map.end())
         t_map[t] = {INT64_MAX, INT64_MAX};
 
@@ -343,7 +341,7 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         continue;
                     for (const auto &pt2 : pk2.second.at(0)) {
                         DP_type new_DP_var = {sto_to2 - mat2 + pt2.second.storage + pt1.second.storage + matv,
-                                              pt2.second.retrieval + ret_to2 * pk2.first + pt1.second.retrieval,
+                                              pt2.second.retrieval + ret_to2 * (long long)pk2.first + pt1.second.retrieval,
                                               0};
                         int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         if (new_DP_var.storage > S)
@@ -380,7 +378,7 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                             continue;
                         for (const auto &pt1: pk1.second.at(0)) {
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_to2 - mat2 + pt1.second.storage + pt2.second.storage + matv,
-                                                  pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * pk2.first,
+                                                  pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * (long long)pk2.first,
                                                   0};
                             int new_k = pk1.first + pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                             if (new_DP_var.storage > S)
