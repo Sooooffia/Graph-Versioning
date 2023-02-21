@@ -29,9 +29,9 @@ IntGraph LMG(const IntGraph& G, int S) {
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_nodes.empty()) {
-        cout << active_nodes.size() << "nodes left\n";
+        cout << active_nodes.size() << " nodes left" << endl;
         // 1. Calculate rho for all active nodes and find maximum
-        map<int, double> rho; // For each v, rho[v] is the value over cost of materializing v.
+        unordered_map<int, double> rho; // For each v, rho[v] is the value over cost of materializing v.
         for (auto v : active_nodes) {
             int pred = H.get_in_neighbors_of(v, true)[0];
             // The storage budget SHOULD allow for materializing v.
@@ -111,9 +111,9 @@ IntGraph LMG_all(const IntGraph& G, int S) {
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_edges.empty()) {
-//        cout << active_edges.size() << " edges left ";
+//        cout << active_edges.size() << " edges left " << endl;
         // 1. Calculate rho for all active nodes and find maximum
-        map<int, double> rho; // For each i, rho[i] is the value over cost of replacing some edge with edge i.
+        unordered_map<int, double> rho; // For each i, rho[i] is the value over cost of replacing some edge with edge i.
         for (auto i : active_edges) {
             auto &[u, v, w] = edges[i];
             auto pred = H.get_in_neighbors_of(v, true)[0];

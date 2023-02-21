@@ -52,7 +52,7 @@ void update_DP(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val
     if (new_val.storage < 0 or new_val.retrieval < 0)
         throw logic_error("Aghhhhhhh");
     if (t_map.find(t) == t_map.end())
-        t_map[t] = {INT32_MAX, INT32_MAX};
+        t_map[t] = {INT64_MAX, INT64_MAX};
 
     if (t_map[t].storage > new_val.storage)
         t_map[t] = new_val;
@@ -69,7 +69,7 @@ void update_OPT(map<int, edge_variables, std::greater<>> &t_map, int t, const ed
 
 void update_OPT(map<int, DP_type, std::greater<>> &t_map, int t, const DP_type &new_val) {
     if (t_map.find(t) == t_map.end())
-        t_map[t] = {INT32_MAX, INT32_MAX};
+        t_map[t] = {INT64_MAX, INT64_MAX};
 
     if (t_map[t].storage > new_val.storage)
         t_map[t] = new_val;
@@ -245,7 +245,7 @@ pair<IntGraph, IntGraph> make_binary_bidirectional(const IntGraph &G, int r) {//
     return {H, Arb};
 }
 
-map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, double epsilon, long S, long R_of_MST) {
+map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
     auto [H, Arb] = make_binary_bidirectional(G, r);
 
     // 1. Calculating parameters

@@ -388,10 +388,26 @@ IntGraph MST_with_designated_root(const IntGraph &G, int r) {//TODO: not tested
     return H;
 }
 
-IntGraph Symmetric_MST_with_min_weight(const IntGraph &G) {//TODO: this may improve the choice of tree.
+IntGraph Symmetric_MST_with_min_weight(const IntGraph &G, int r) {//TODO: this may improve the choice of tree.
     IntGraph GG;
-//    for (const auto &[u,v,w] : G.get_edges(false)) {
-//        GG.add_or_modify_edge()
-//    }
-    return GG;
+    for (const auto &[u,v,w] : G.get_edges(false)) {
+        edge_variables new_edge{std::min(w.storage, G[v][u].storage), std::min(w.retrieval, G[v][u].retrieval)};
+        GG.add_or_modify_edge(u, v, new_edge, true);
+        GG.add_or_modify_edge(v, u, new_edge);
+    }
+    for (const auto &v : G.get_nodes(false))
+        GG.add_or_modify_edge(0, v, G[0][v]);
+    auto MM = MST_with_designated_root(GG, r);
+
+    cout << MM.size(false) << " " << MM.get_edges(false).size() << endl;
+
+    IntGraph ans;
+    for (const auto &[u,v,w] : MM.get_edges(false)) {
+        ans.add_or_modify_edge(u, v, G[u][v], true);
+        ans.add_or_modify_edge(v, u, G[v][u]);
+    }
+    for (const auto &v : G.get_nodes(false))
+        ans.add_or_modify_edge(0, v, G[0][v]);
+    cout << ans.size(false) << " " << ans.get_edges(false).size() << endl;
+    return ans;
 }

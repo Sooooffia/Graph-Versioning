@@ -25,6 +25,7 @@ void LMG_vs_LMGA_on_git_graph(const string& name) {
 
     output_file << "LMG solution,LMG-All solution,LMG time,LMG-All time,storage constraint" << endl;
     for (double beta = 1; beta < 2; beta += 0.05) {
+        cout << "Testing beta = " << beta << endl;
         auto start_LMG = high_resolution_clock::now();
         auto sol_LMG = LMG(G, S_min*beta);
         auto end_LMG = high_resolution_clock::now();
