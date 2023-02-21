@@ -37,7 +37,7 @@ double log_base_a_of_b(double a, double b) {
 }
 
 int geometrically_discretize(long long val, double epsilon) {
-    return int(log_base_a_of_b(1+epsilon, val+1) + 2);
+    return int(log_base_a_of_b(1+epsilon, val+1));
 }
 
 void update_DP(unordered_map<int, edge_variables> &t_map, int t, const edge_variables &new_val) {
@@ -49,10 +49,7 @@ void update_DP(unordered_map<int, edge_variables> &t_map, int t, const edge_vari
 }
 
 void update_DP(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val) {
-    if (t_map.find(t) == t_map.end())
-        t_map[t] = {INT64_MAX, INT64_MAX};
-
-    if (t_map[t].storage > new_val.storage)
+    if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage)
         t_map[t] = new_val;
 }
 
@@ -66,10 +63,7 @@ void update_OPT(map<int, edge_variables, std::greater<>> &t_map, int t, const ed
 }
 
 void update_OPT(map<int, DP_type, std::greater<>> &t_map, int t, const DP_type &new_val) {
-    if (t_map.find(t) == t_map.end())
-        t_map[t] = {INT64_MAX, INT64_MAX};
-
-    if (t_map[t].storage > new_val.storage)
+    if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage)
         t_map[t] = new_val;
 }
 
@@ -253,7 +247,7 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
 
     // 2. Base cases
     unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>> DP; ///< [v][k][gamma][t]
-    map<int, map<int, DP_type, std::greater<>>> OPT; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
+    unordered_map<int, map<int, DP_type, std::greater<>>> OPT; // OPT[v][t] is the optimal storage cost in the subtree induced by v, given t retrieval constraint.
     unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>> OPT_fixing_k; // OPT[v][gamma][t]
 
     // count number of possible descendents
@@ -289,9 +283,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     DP_type new_DP_var = {sto_to - mat + pt.second.storage + matv,
                                           pt.second.retrieval + ret_to * (long long)pk.first,
                                           0};
-                    int new_k = pk.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                     if (new_DP_var.storage > S)
                         continue;
+                    int new_k = pk.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                     update_DP(DP[v][new_k][0], new_t, new_DP_var);
                 }
             }
@@ -302,12 +296,15 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     DP_type new_DP_var = {sto_from + pt.second.storage,
                                           pt.second.retrieval + ret_from + pt.second.gamma,
                                           ret_from + pt.second.gamma};
-                    int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                     if (new_DP_var.storage > S)
                         continue;
+                    int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                     update_DP(DP[v][1][new_g], new_t, new_DP_var);
                 }
             }
+            OPT.erase(child);
+            DP.erase(child);
+            OPT_fixing_k.erase(child);
         }/// EndFor of onechild
 
         /// Two children
@@ -343,9 +340,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         DP_type new_DP_var = {sto_to2 - mat2 + pt2.second.storage + pt1.second.storage + matv,
                                               pt2.second.retrieval + ret_to2 * (long long)pk2.first + pt1.second.retrieval,
                                               0};
-                        int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         if (new_DP_var.storage > S)
                             continue;
+                        int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         update_DP(DP[v][new_k][0], new_t, new_DP_var);
                     }
                 }
@@ -360,9 +357,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         DP_type new_DP_var = {sto_to1 - mat1 + pt1.second.storage + pt2.second.storage + matv,
                                               pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval,
                                               0};
-                        int new_k = pk1.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         if (new_DP_var.storage > S)
                             continue;
+                        int new_k = pk1.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         update_DP(DP[v][new_k][0], new_t, new_DP_var);
                     }
                 }
@@ -380,9 +377,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_to2 - mat2 + pt1.second.storage + pt2.second.storage + matv,
                                                   pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * (long long)pk2.first,
                                                   0};
-                            int new_k = pk1.first + pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                             if (new_DP_var.storage > S)
                                 continue;
+                            int new_k = pk1.first + pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                             update_DP(DP[v][new_k][0], new_t, new_DP_var);
                         }
                     }
@@ -396,9 +393,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         DP_type new_DP_var = {sto_from1 + pt1.second.storage + pt2.second.storage,
                                               pt1.second.retrieval + pt2.second.retrieval + pt1.second.gamma + ret_from1,
                                               pt1.second.gamma + ret_from1};
-                        int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         if (new_DP_var.storage > S)
                             continue;
+                        int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         update_DP(DP[v][1][new_g], new_t, new_DP_var);
                     }
                 }
@@ -411,9 +408,9 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         DP_type new_DP_var = {sto_from2 + pt2.second.storage + pt1.second.storage,
                                               pt2.second.retrieval + pt1.second.retrieval + pt2.second.gamma + ret_from2,
                                               pt2.second.gamma + ret_from2};
-                        int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         if (new_DP_var.storage > S)
                             continue;
+                        int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                         update_DP(DP[v][1][new_g], new_t, new_DP_var);
                     }
                 }
@@ -430,11 +427,11 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                                                   pt1.second.retrieval + (ret_from1 + pt1.second.gamma + ret_to2) * (long long)pk2.first
                                                   + pt2.second.retrieval + ret_from1 + pt1.second.gamma,
                                                   ret_from1 + pt1.second.gamma};
+                            if (new_DP_var.storage > S)
+                                continue;
                             int new_k = pk2.first + 1;
                             int new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                             int new_g = geometrically_discretize(new_DP_var.gamma,epsilon);
-                            if (new_DP_var.storage > S)
-                                continue;
                             update_DP(DP[v][new_k][new_g], new_t, new_DP_var);
                         }
                     }
@@ -452,11 +449,11 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                                                   pt2.second.retrieval + (ret_from2 + pt2.second.gamma + ret_to1) * (long long)pk1.first
                                                   + pt1.second.retrieval + ret_from2 + pt2.second.gamma,
                                                   ret_from2 + pt2.second.gamma};
+                            if (new_DP_var.storage > S)
+                                continue;
                             int new_k = pk1.first + 1;
                             int new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
                             int new_g = geometrically_discretize(new_DP_var.gamma,epsilon);
-                            if (new_DP_var.storage > S)
-                                continue;
                             update_DP(DP[v][new_k][new_g], new_t, new_DP_var);
                         }
                     }
