@@ -18,38 +18,62 @@ void test_make_binary() {
     cout << H.get_edges(true);
 }
 
-//void try_DP_on_rg() {
-//    IntGraph G(100, 0.2, false);
-//    auto M = MST(G);
-//    int S_min = M.get_total_storage_cost();
-//    IntGraph Arb = MST_with_designated_root(G, 1);
-//
-//    int ans = DP_arborescence(Arb, 1, 20.0, S_min * 1.1, M.get_total_retrieval_cost() / 4);
-//    int opt = prob3_ILP(Arb, S_min * 1.2).get_total_retrieval_cost();
-//
-//    cout << ans << " ";
-//    cout << M.get_total_retrieval_cost() << endl;
-//}
+IntGraph recover_graph(const IntGraph &Arb, const IntGraph &T, const unordered_map<int, int> &change_type) {
+    IntGraph ret;
+    for (const auto &p : change_type) {
+        const int &v = p.first;
 
-//void test_DP_on_git_graph(const string &name, double epsilon) {
-//    string graph_name = "../Experiments/" + name + "-cpp.txt";
-//    string output_name = "../Experiments/" + name + "-DP-output.csv";
-//    ifstream graph_file(graph_name);
-//    ofstream output_file(output_name);
-//    if (!graph_file.is_open())
-//        throw logic_error("failed to open file\n");
-//
-//    auto G = read_graph(graph_file);
-//    auto M = MST(G);
-//    int S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
-//    int r = G.size(false);
-//    IntGraph Arb = MST_with_designated_root(G, r);
-//
-//    auto ans = DP_arb_modified(Arb, r, epsilon, S_min * 2, R_of_MST);
-//    for (const auto &p : ans) {//TODO: check the rounding here as well.
-//        output_file << p.second.storage << " " << p.second.retrieval << " " << p.first << endl;
-//    }
-//}
+        auto out_edges = Arb.get_out_edges_of(v);
+        if (out_edges.size() == 1) {
+            int child = out_edges.begin()->first;
+            switch (p.second) {
+                case 2:
+                    ret.add_or_modify_edge(v, child, T[v][child], true);
+                    break;
+                case 3:
+                    ret.add_or_modify_edge(child, v, T[child][v], true);
+                    break;
+                case 1:
+                    ret.add_or_modify_edge(0, v, T[0][v], true);
+                    break;
+            }
+        } else if (out_edges.size() == 2) {
+            int child1 = out_edges.begin()->first, child2 = (++out_edges.begin())->first;
+            switch (p.second) {
+                case 5:
+                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
+                    break;
+                case 6:
+                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
+                    break;
+                case 7:
+                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
+                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
+                    break;
+                case 8:
+                    ret.add_or_modify_edge(child1, v, T[child1][v], true);
+                    break;
+                case 9:
+                    ret.add_or_modify_edge(child2, v, T[child2][v], true);
+                    break;
+                case 10:
+                    ret.add_or_modify_edge(child1, v, T[child1][v], true);
+                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
+                    break;
+                case 11:
+                    ret.add_or_modify_edge(child2, v, T[child2][v], true);
+                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
+                    break;
+                case 4:
+                    ret.add_or_modify_edge(0, v, T[0][v], true);
+                    break;
+            }
+        } else if (out_edges.empty()) {
+            ret.add_or_modify_edge(0, v, T[0][v], true);
+        }
+    }
+        return ret;
+}
 
 void test_DP_on_git_graph(const string &name, double epsilon) {
     string graph_name = "../Experiments/" + name + "-cpp.txt";
@@ -76,13 +100,17 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
     long long S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
 
     auto start_DP = high_resolution_clock::now();
-    auto ans = DP_bidirectional(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
+    auto [Arbb,H, ans] = DP_bidirectional_s(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
     auto end_DP = high_resolution_clock::now();
 
+    cout << "DP finished" << endl;
+    IntGraph first_graph = recover_graph(Arbb, H, ans.begin()->second.change_type);
+    cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size();
+    output_file << "time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << ",first storage:" << first_graph.get_total_storage_cost()
+        << ",first retrieval:" << first_graph.get_total_retrieval_cost() << endl;
     for (const auto &p : ans) {//TODO: check the rounding here as well.
         output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
     }
-    output_file << "time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
 }
 
 

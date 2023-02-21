@@ -23,16 +23,16 @@ int main() {
 //    LMG_vs_LMGA_on_git_graph("styleguide(RG, p=0.2)"); // 493 nodes and 48450 edges
 //    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation(RG, p=0.2)"); // 246 nodes and 11932 edges
 
-    test_DP_on_git_graph("styleguide", 0.05);
-//    test_DP_on_git_graph("LeetCodeAnimation", 0.05);
-//    test_DP_on_git_graph("gitignore", 0.05);
-//    test_DP_on_git_graph("SmartThingsPublic", 0.05);
-//    test_DP_on_git_graph("styleguide(RG, p=0.05)", 0.05);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.05)", 0.05);
-//    test_DP_on_git_graph("styleguide(RG, p=0.2)", 0.05);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.2)", 0.05);
-//    test_DP_on_git_graph("styleguide(RG, p=1)", 0.05);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=1)", 0.05);
+//    test_DP_on_git_graph("styleguide", 0.01);
+    test_DP_on_git_graph("LeetCodeAnimation", 0.05);
+//    test_DP_on_git_graph("gitignore", 0.01);
+//    test_DP_on_git_graph("SmartThingsPublic", 0.01);
+//    test_DP_on_git_graph("styleguide(RG, p=0.05)", 0.01);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.05)", 0.01);
+//    test_DP_on_git_graph("styleguide(RG, p=0.2)", 0.01);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.2)", 0.01);
+//    test_DP_on_git_graph("styleguide(RG, p=1)", 0.01);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=1)", 0.01);
 
 
 //    test_OPT_on_git_grpah("LeetCodeAnimation");
