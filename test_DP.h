@@ -18,64 +18,51 @@ void test_make_binary() {
     cout << H.get_edges(true);
 }
 
-IntGraph recover_graph(const IntGraph &Arb, const IntGraph &T, const unordered_map<int, int> &change_type) {
-    IntGraph ret;
-    for (const auto &p : change_type) {
-        const int &v = p.first;
-
-        auto out_edges = Arb.get_out_edges_of(v);
-        if (out_edges.size() == 1) {
-            int child = out_edges.begin()->first;
-            switch (p.second) {
-                case 2:
-                    ret.add_or_modify_edge(v, child, T[v][child], true);
-                    break;
-                case 3:
-                    ret.add_or_modify_edge(child, v, T[child][v], true);
-                    break;
-                case 1:
-                    ret.add_or_modify_edge(0, v, T[0][v], true);
-                    break;
-            }
-        } else if (out_edges.size() == 2) {
-            int child1 = out_edges.begin()->first, child2 = (++out_edges.begin())->first;
-            switch (p.second) {
-                case 5:
-                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
-                    break;
-                case 6:
-                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
-                    break;
-                case 7:
-                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
-                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
-                    break;
-                case 8:
-                    ret.add_or_modify_edge(child1, v, T[child1][v], true);
-                    break;
-                case 9:
-                    ret.add_or_modify_edge(child2, v, T[child2][v], true);
-                    break;
-                case 10:
-                    ret.add_or_modify_edge(child1, v, T[child1][v], true);
-                    ret.add_or_modify_edge(v, child2, T[v][child2], true);
-                    break;
-                case 11:
-                    ret.add_or_modify_edge(child2, v, T[child2][v], true);
-                    ret.add_or_modify_edge(v, child1, T[v][child1], true);
-                    break;
-                case 4:
-                    ret.add_or_modify_edge(0, v, T[0][v], true);
-                    break;
-            }
-        } else if (out_edges.empty()) {
-            ret.add_or_modify_edge(0, v, T[0][v], true);
-        }
+void recover_graph(IntGraph &ansG, const IntGraph &T, connection_type con) {
+    const int &v = con.v, &child1 = con.child1, &child2 = con.child2;
+    switch (con.val) {
+        case 2:
+            ansG.add_or_modify_edge(v, child1, T[v][child1], true);
+            break;
+        case 3:
+            ansG.add_or_modify_edge(child1, v, T[child1][v], true);
+            break;
+        case 5:
+            ansG.add_or_modify_edge(v, child2, T[v][child2], true);
+            break;
+        case 6:
+            ansG.add_or_modify_edge(v, child1, T[v][child1], true);
+            break;
+        case 7:
+            ansG.add_or_modify_edge(v, child2, T[v][child2], true);
+            ansG.add_or_modify_edge(v, child1, T[v][child1], true);
+            break;
+        case 8:
+            ansG.add_or_modify_edge(child1, v, T[child1][v], true);
+            break;
+        case 9:
+            ansG.add_or_modify_edge(child2, v, T[child2][v], true);
+            break;
+        case 10:
+            ansG.add_or_modify_edge(child1, v, T[child1][v], true);
+            ansG.add_or_modify_edge(v, child2, T[v][child2], true);
+            break;
+        case 11:
+            ansG.add_or_modify_edge(child2, v, T[child2][v], true);
+            ansG.add_or_modify_edge(v, child1, T[v][child1], true);
+            break;
     }
-        return ret;
+    const auto nodes = ansG.get_nodes(false);
+    if (nodes.find(v) == nodes.end() or ansG.get_in_edges_of(v, true).empty()) {
+        ansG.add_or_modify_edge(0, v, T[0][v], true);
+    }
+    if (child1 > 0)
+        recover_graph(ansG, T, *(con.con1));
+    if (child2 > 0)
+        recover_graph(ansG, T, *(con.con2));
 }
 
-void test_DP_on_git_graph(const string &name, double epsilon) {
+void test_DP_on_git_graph(const string &name, double epsilon, bool use_storage=false) {
     string graph_name = "../Experiments/" + name + "-cpp.txt";
     string output_name = "../Experiments/" + name + "-DP-output.csv";
     ifstream graph_file(graph_name);
@@ -84,7 +71,9 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
         throw logic_error("failed to open file\n");
 
     auto G = read_graph(graph_file);
+    cout << G.size(false) << " " << G.get_edges(false).size() << endl;
 
+    auto start_DP = high_resolution_clock::now();
     int r = 1;
     IntGraph Arb = MST_with_designated_root(G, r);
     IntGraph bidirectional_T;
@@ -95,22 +84,44 @@ void test_DP_on_git_graph(const string &name, double epsilon) {
     for (const auto &v : G.get_nodes(false)) {
         bidirectional_T.add_or_modify_edge(0, v, G[0][v], true);
     }
+    cout << bidirectional_T.size(false) << " " << bidirectional_T.get_edges(false).size() << endl;
 
     auto M = MST(bidirectional_T);
     long long S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
 
-    auto start_DP = high_resolution_clock::now();
-    auto [Arbb,H, ans] = DP_bidirectional_s(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
-    auto end_DP = high_resolution_clock::now();
+    if (use_storage) {
+        auto [Arbb, H, OPT, OPT_k, DP] = DP_bidirectional_s(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
+        auto ans = OPT[r];
+        auto end_DP = high_resolution_clock::now();
+        cout << "DP finished" << endl;
 
-    cout << "DP finished" << endl;
-    IntGraph first_graph = recover_graph(Arbb, H, ans.begin()->second.change_type);
-    cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size();
-    output_file << "time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << ",first storage:" << first_graph.get_total_storage_cost()
-        << ",first retrieval:" << first_graph.get_total_retrieval_cost() << endl;
-    for (const auto &p : ans) {//TODO: check the rounding here as well.
-        output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
+        IntGraph first_graph;
+        recover_graph(first_graph, H, ans.begin()->second.con); //simulate recovering graph
+//        cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size();
+
+        output_file << ",,,time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
+        for (const auto &p: ans) {
+            output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
+        }
     }
+    else {
+        auto [Arbb, H, OPT, DP] = DP_bidirectional(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
+        auto ans = OPT[r];
+        auto end_DP = high_resolution_clock::now();
+
+        IntGraph first_graph;
+        recover_graph(first_graph, H, ans.begin()->second.con); //simulate recovering graph
+//        cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size();
+
+        output_file << ",,,time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
+        for (const auto &p: ans) {
+            output_file << p.second.storage << "," << p.second.retrieval << "," << p.first << "," << endl;
+        }
+    }
+
+
+
+
 }
 
 

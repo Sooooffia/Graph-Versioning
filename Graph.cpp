@@ -16,8 +16,8 @@ void IntGraph::make_node(int v) {
     if (v != 0)
         n++;
     nodes.insert(v);
-    inNeighbors.insert({v,unordered_map<int,edge_variables>()});
-    outNeighbors.insert({v,unordered_map<int,edge_variables>()});
+    inNeighbors.insert({v, {}});
+    outNeighbors.insert({v, {}});
 }
 void IntGraph::make_edge(int u, int v, const edge_variables& costs) {
     inNeighbors[v][u] = costs;
@@ -119,6 +119,8 @@ vector<tuple<int, int>> IntGraph::get_nodes_and_storage(bool aux) const {
 }
 
 unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v,bool aux) const {
+    if (inNeighbors.find(v) == inNeighbors.end())
+        throw std::invalid_argument("input v of get_in_edges_of() is invalid. v=" + to_string(v));
     unordered_map<int, edge_variables> output = inNeighbors.at(v);
     if (!aux){
         output.erase(0);
@@ -126,6 +128,8 @@ unordered_map<int, edge_variables> IntGraph::get_in_edges_of(int v,bool aux) con
     return output;
 }
 const unordered_map<int, edge_variables>& IntGraph::get_out_edges_of(int v) const {
+    if (outNeighbors.find(v) == outNeighbors.end())
+        throw std::invalid_argument("input v of get_out_edges_of() is invalid. v=" + to_string(v));
     return outNeighbors.at(v);
 }
 vector<tuple<int, int, edge_variables>> IntGraph::get_edges(bool aux) const {

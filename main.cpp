@@ -17,22 +17,26 @@ int main() {
 //    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation");//246 nodes and 628 edges
 //    LMG_vs_LMGA_on_git_graph("styleguide"); // 493 nodes and 1250 edges
 //    LMG_vs_LMGA_on_git_graph("gitignore"); // 3526 nodes and 9856 edges
-//    LMG_vs_LMGA_on_git_graph("SmartThingsPublic"); // 5148 nodes and 15044 edges
+    LMG_vs_LMGA_on_git_graph("SmartThingsPublic"); // 5148 nodes and 15044 edges
+    LMG_vs_LMGA_on_git_graph("996.ICU"); // 5148 nodes and 15044 edges
+    LMG_vs_LMGA_on_git_graph("ChatGPT"); // 5148 nodes and 15044 edges
 //    LMG_vs_LMGA_on_git_graph("styleguide(RG, p=0.05)"); // 493 nodes and 12040 edges
 //    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation(RG, p=0.05)"); // 246 nodes and 3032 edges
 //    LMG_vs_LMGA_on_git_graph("styleguide(RG, p=0.2)"); // 493 nodes and 48450 edges
 //    LMG_vs_LMGA_on_git_graph("LeetCodeAnimation(RG, p=0.2)"); // 246 nodes and 11932 edges
 
-//    test_DP_on_git_graph("styleguide", 0.01);
-    test_DP_on_git_graph("LeetCodeAnimation", 0.05);
-//    test_DP_on_git_graph("gitignore", 0.01);
-//    test_DP_on_git_graph("SmartThingsPublic", 0.01);
-//    test_DP_on_git_graph("styleguide(RG, p=0.05)", 0.01);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.05)", 0.01);
-//    test_DP_on_git_graph("styleguide(RG, p=0.2)", 0.01);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.2)", 0.01);
-//    test_DP_on_git_graph("styleguide(RG, p=1)", 0.01);
-//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=1)", 0.01);
+    test_DP_on_git_graph("SmartThingsPublic", 0.02, true);
+    test_DP_on_git_graph("996.ICU", 0.02, true);
+//    test_DP_on_git_graph("gitignore", 0.05, true);
+//    test_DP_on_git_graph("styleguide", 0.01, true);
+//    test_DP_on_git_graph("LeetCodeAnimation", 0.01, true);
+//    test_DP_on_git_graph("styleguide(RG, p=0.05)", 0.01, true);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.05)", 0.01, true);
+//    test_DP_on_git_graph("styleguide(RG, p=0.2)", 0.01, true);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=0.2)", 0.01, true);
+//    test_DP_on_git_graph("styleguide(RG, p=1)", 0.05);
+//    test_DP_on_git_graph("LeetCodeAnimation(RG, p=1)", 0.05);
+    test_DP_on_git_graph("ChatGPT", 0.01, true);
 
 
 //    test_OPT_on_git_grpah("LeetCodeAnimation");

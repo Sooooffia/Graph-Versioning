@@ -87,16 +87,22 @@ pair<IntGraph, IntGraph> make_binary_bidirectional(const IntGraph &G, int r) {//
 }
 
 void update_DP(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val) {
-    if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage)
+    if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage) {
         t_map[t] = new_val;
+    }
 }
 
 void update_OPT(map<int, DP_type, std::greater<>> &t_map, int t, const DP_type &new_val) {
     if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage)
         t_map[t] = new_val;
 }
+void update_OPT(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val) {
+    if (t_map.find(t) == t_map.end() or t_map[t].storage > new_val.storage)
+        t_map[t] = new_val;
+}
 
-map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
+tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type, std::greater<>>>, unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>>>
+        DP_bidirectional(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
     auto [H, Arb] = make_binary_bidirectional(G, r);
 
     // 1. Calculating parameters
@@ -112,7 +118,7 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
     // count number of possible descendents
     for (const auto &v : nodes) {
         if (Arb.get_out_neighbors_of(v).empty()) {
-            DP[v][1][0][0] = OPT[v][0] = OPT_fixing_k[v][0][0] = {H[0][v].storage, 0, 0};
+            DP[v][1][0][0] = OPT[v][0] = OPT_fixing_k[v][0][0] = {H[0][v].storage, 0, 0, {v, 0, -1, nullptr, -1, nullptr}};
         }
     }
 
@@ -128,10 +134,13 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
 
             // 1. Independent.
             for (const auto &pt : OPT[child]) {
-                long long new_s = pt.second.storage + matv;
-                if (new_s > S)
+                DP_type new_DP_var = {pt.second.storage + matv,
+                                      pt.second.retrieval,
+                                      0,
+                                      {v, 1, child, &pt.second.con, -1, nullptr}};
+                if (new_DP_var.storage > S)
                     continue;
-                update_DP(DP[v][1][0], pt.first, {new_s, pt.second.retrieval, 0});
+                update_DP(DP[v][1][0], pt.first, new_DP_var);
             }
 
             // 2. v to child
@@ -141,7 +150,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                 for (const auto &pt : pk.second.at(0)) {
                     DP_type new_DP_var = {sto_to - mat + pt.second.storage + matv,
                                           pt.second.retrieval + ret_to * (long long)pk.first,
-                                          0};
+                                          0,
+                                          {v, 2, child, &pt.second.con, -1, nullptr}};
                     if (new_DP_var.storage > S)
                         continue;
                     int new_k = pk.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -154,7 +164,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                 for (const auto &pt : pg.second) {
                     DP_type new_DP_var = {sto_from + pt.second.storage,
                                           pt.second.retrieval + ret_from + pt.second.gamma,
-                                          ret_from + pt.second.gamma};
+                                          ret_from + pt.second.gamma,
+                                          {v, 3, child, &pt.second.con, -1, nullptr}};
                     if (new_DP_var.storage > S)
                         continue;
                     int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -183,7 +194,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                 for (const auto &pt2 : OPT[child2]) {
                     DP_type new_DP_var = {pt1.second.storage + pt2.second.storage + matv,
                                           pt1.second.retrieval + pt2.second.retrieval,
-                                          0};
+                                          0,
+                                          {v, 4, child1, &pt1.second.con, child2, &pt2.second.con}};
                     if (new_DP_var.storage > S)
                         continue;
                     update_DP(DP[v][1][0], geometrically_discretize(new_DP_var.retrieval, epsilon), new_DP_var);
@@ -198,7 +210,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     for (const auto &pt2 : pk2.second.at(0)) {
                         DP_type new_DP_var = {sto_to2 - mat2 + pt2.second.storage + pt1.second.storage + matv,
                                               pt2.second.retrieval + ret_to2 * (long long)pk2.first + pt1.second.retrieval,
-                                              0};
+                                              0,
+                                              {v, 5, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -215,7 +228,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     for (const auto &pt1 : pk1.second.at(0)) {
                         DP_type new_DP_var = {sto_to1 - mat1 + pt1.second.storage + pt2.second.storage + matv,
                                               pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval,
-                                              0};
+                                              0,
+                                              {v, 6, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk1.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -235,7 +249,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                         for (const auto &pt1: pk1.second.at(0)) {
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_to2 - mat2 + pt1.second.storage + pt2.second.storage + matv,
                                                   pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * (long long)pk2.first,
-                                                  0};
+                                                  0,
+                                                  {v, 7, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk1.first + pk2.first + 1, new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -251,7 +266,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     for (const auto &pt1 : pg1.second) {
                         DP_type new_DP_var = {sto_from1 + pt1.second.storage + pt2.second.storage,
                                               pt1.second.retrieval + pt2.second.retrieval + pt1.second.gamma + ret_from1,
-                                              pt1.second.gamma + ret_from1};
+                                              pt1.second.gamma + ret_from1,
+                                              {v, 8, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -266,7 +282,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                     for (const auto &pt2 : pg2.second) {
                         DP_type new_DP_var = {sto_from2 + pt2.second.storage + pt1.second.storage,
                                               pt2.second.retrieval + pt1.second.retrieval + pt2.second.gamma + ret_from2,
-                                              pt2.second.gamma + ret_from2};
+                                              pt2.second.gamma + ret_from2,
+                                              {v, 9, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.retrieval, epsilon);
@@ -285,7 +302,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                             DP_type new_DP_var = {sto_to2 - mat2 + sto_from1 + pt1.second.storage + pt2.second.storage,
                                                   pt1.second.retrieval + (ret_from1 + pt1.second.gamma + ret_to2) * (long long)pk2.first
                                                   + pt2.second.retrieval + ret_from1 + pt1.second.gamma,
-                                                  ret_from1 + pt1.second.gamma};
+                                                  ret_from1 + pt1.second.gamma,
+                                                  {v, 10, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk2.first + 1;
@@ -297,7 +315,7 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                 }
             }
 
-            // 7. (child2, v) (v, child1)
+            // 8. (child2, v) (v, child1)
             for (const auto &pk1 : DP[child1]) {
                 if (pk1.second.find(0) == pk1.second.end())
                     continue;
@@ -307,7 +325,8 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_from2 + pt2.second.storage + pt1.second.storage,
                                                   pt2.second.retrieval + (ret_from2 + pt2.second.gamma + ret_to1) * (long long)pk1.first
                                                   + pt1.second.retrieval + ret_from2 + pt2.second.gamma,
-                                                  ret_from2 + pt2.second.gamma};
+                                                  ret_from2 + pt2.second.gamma,
+                                                  {v, 11, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk1.first + 1;
@@ -339,19 +358,16 @@ map<int, DP_type, std::greater<>> DP_bidirectional(const IntGraph &G, int r, dou
         for (const auto &pk : DP[v]) {
             for (const auto &pg : pk.second)  {
                 for (const auto &pt : pg.second) {
-                    update_DP(OPT_fixing_k[v][pg.first], pt.first, pt.second);
+                    update_OPT(OPT_fixing_k[v][pg.first], pt.first, pt.second);
                 }
             }
         }
     }
-    return OPT[r];
+    return {std::move(Arb), std::move(H), std::move(OPT), std::move(DP)};
 }
 
-void update_DP_s(unordered_map<int, DP_type> &t_map, int t, DP_type &new_val, pair<int, int> change_type, const unordered_map<int, int> &change1, const unordered_map<int, int> &change2={}) {
+void update_DP_s(unordered_map<int, DP_type> &t_map, int t, DP_type &new_val) {
     if (t_map.find(t) == t_map.end() or t_map[t].retrieval > new_val.retrieval) {
-        new_val.change_type = change1;
-        new_val.change_type.insert(change2.begin(), change2.end());
-        new_val.change_type[change_type.first] = change_type.second;
         t_map[t] = new_val;
     }
 }
@@ -366,8 +382,10 @@ void update_OPT_s(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_
     }
 }
 
-tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
+tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>, unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>>>
+    DP_bidirectional_s(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
     auto [H, Arb] = make_binary_bidirectional(G, r);
+    cout << H.size(false) << " " << H.get_edges(false).size() << endl;
 
     // 1. Calculating parameters
     auto nodes = Arb.get_nodes_in_bfs_order(r);
@@ -383,7 +401,7 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
     for (const auto &v : nodes) {
         if (Arb.get_out_neighbors_of(v).empty()) {
             int s = geometrically_discretize(H[0][v].storage, epsilon);
-            DP[v][1][0][s] = OPT[v][s] = OPT_fixing_k[v][0][s] = {H[0][v].storage, 0, 0, {{v, 0}}};//TODO: check intialization of map
+            DP[v][1][0][s] = OPT[v][s] = OPT_fixing_k[v][0][s] = {H[0][v].storage, 0, 0, {v, 0, -1, nullptr, -1, nullptr}};//TODO: check intialization of map
         }
     }
 
@@ -401,11 +419,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
             for (const auto &pt : OPT[child]) {
                 DP_type new_DP_var = {pt.second.storage + matv,
                                       pt.second.retrieval,
-                                      0};
+                                      0,
+                                      {v, 1, child, &pt.second.con, -1, nullptr}};
                 if (new_DP_var.storage > S)
                     continue;
                 int new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                update_DP_s(DP[v][1][0], new_t, new_DP_var, {v, 1}, pt.second.change_type);
+                update_DP_s(DP[v][1][0], new_t, new_DP_var);
             }
 
             // 2. v to child
@@ -415,11 +434,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                 for (const auto &pt : pk.second.at(0)) {
                     DP_type new_DP_var = {sto_to - mat + pt.second.storage + matv,
                                           pt.second.retrieval + ret_to * (long long)pk.first,
-                                          0};
+                                          0,
+                                          {v, 2, child, &pt.second.con, -1, nullptr}};
                     if (new_DP_var.storage > S)
                         continue;
                     int new_k = pk.first + 1, new_t= geometrically_discretize(new_DP_var.storage, epsilon);
-                    update_DP_s(DP[v][new_k][0], new_t, new_DP_var, {v, 2}, pt.second.change_type);
+                    update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
                 }
             }
 
@@ -428,16 +448,14 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                 for (const auto &pt : pg.second) {
                     DP_type new_DP_var = {sto_from + pt.second.storage,
                                           pt.second.retrieval + ret_from + pt.second.gamma,
-                                          ret_from + pt.second.gamma};
+                                          ret_from + pt.second.gamma,
+                                          {v, 3, child, &pt.second.con, -1, nullptr}};
                     if (new_DP_var.storage > S)
                         continue;
                     int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                    update_DP_s(DP[v][1][new_g], new_t, new_DP_var, {v, 3}, pt.second.change_type);
+                    update_DP_s(DP[v][1][new_g], new_t, new_DP_var);
                 }
             }
-            OPT.erase(child);
-            DP.erase(child);
-            OPT_fixing_k.erase(child);
         }/// EndFor of onechild
 
         /// Two children
@@ -457,10 +475,11 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                 for (const auto &pt2 : OPT[child2]) {
                     DP_type new_DP_var = {pt1.second.storage + pt2.second.storage + matv,
                                           pt1.second.retrieval + pt2.second.retrieval,
-                                          0};
+                                          0,
+                                          {v, 4, child1, &pt1.second.con, child2, &pt2.second.con}};
                     if (new_DP_var.storage > S)
                         continue;
-                    update_DP_s(DP[v][1][0], geometrically_discretize(new_DP_var.storage, epsilon), new_DP_var, {v, 4}, pt1.second.change_type, pt2.second.change_type);
+                    update_DP_s(DP[v][1][0], geometrically_discretize(new_DP_var.storage, epsilon), new_DP_var);
                 }
             }
 
@@ -472,11 +491,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                     for (const auto &pt2 : pk2.second.at(0)) {
                         DP_type new_DP_var = {sto_to2 - mat2 + pt2.second.storage + pt1.second.storage + matv,
                                               pt2.second.retrieval + ret_to2 * (long long)pk2.first + pt1.second.retrieval,
-                                              0};
+                                              0,
+                                              {v, 5, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var, {v, 5}, pt1.second.change_type, pt2.second.change_type);
+                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
                     }
                 }
             }
@@ -489,11 +509,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                     for (const auto &pt1 : pk1.second.at(0)) {
                         DP_type new_DP_var = {sto_to1 - mat1 + pt1.second.storage + pt2.second.storage + matv,
                                               pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval,
-                                              0};
+                                              0,
+                                              {v, 6, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk1.first + 1, new_t= geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var, {v, 6}, pt1.second.change_type, pt2.second.change_type);
+                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
                     }
                 }
             }
@@ -509,11 +530,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                         for (const auto &pt1: pk1.second.at(0)) {
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_to2 - mat2 + pt1.second.storage + pt2.second.storage + matv,
                                                   pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * (long long)pk2.first,
-                                                  0};
+                                                  0,
+                                                  {v, 7, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk1.first + pk2.first + 1, new_s= geometrically_discretize(new_DP_var.storage, epsilon);
-                            update_DP_s(DP[v][new_k][0], new_s, new_DP_var, {v, 7}, pt1.second.change_type, pt2.second.change_type);
+                            update_DP_s(DP[v][new_k][0], new_s, new_DP_var);
                         }
                     }
                 }
@@ -525,11 +547,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                     for (const auto &pt1 : pg1.second) {
                         DP_type new_DP_var = {sto_from1 + pt1.second.storage + pt2.second.storage,
                                               pt1.second.retrieval + pt2.second.retrieval + pt1.second.gamma + ret_from1,
-                                              pt1.second.gamma + ret_from1};
+                                              pt1.second.gamma + ret_from1,
+                                              {v, 8, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t= geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][1][new_g], new_t, new_DP_var, {v, 8}, pt1.second.change_type, pt2.second.change_type);
+                        update_DP_s(DP[v][1][new_g], new_t, new_DP_var);
                     }
                 }
             }
@@ -540,11 +563,12 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                     for (const auto &pt2 : pg2.second) {
                         DP_type new_DP_var = {sto_from2 + pt2.second.storage + pt1.second.storage,
                                               pt2.second.retrieval + pt1.second.retrieval + pt2.second.gamma + ret_from2,
-                                              pt2.second.gamma + ret_from2};
+                                              pt2.second.gamma + ret_from2,
+                                              {v, 9, child1, &pt1.second.con, child2, &pt2.second.con}};
                         if (new_DP_var.storage > S)
                             continue;
                         int new_g = geometrically_discretize(new_DP_var.gamma, epsilon), new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][1][new_g], new_t, new_DP_var, {v, 9}, pt1.second.change_type, pt2.second.change_type);
+                        update_DP_s(DP[v][1][new_g], new_t, new_DP_var);
                     }
                 }
             }
@@ -559,13 +583,14 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                             DP_type new_DP_var = {sto_to2 - mat2 + sto_from1 + pt1.second.storage + pt2.second.storage,
                                                   pt1.second.retrieval + (ret_from1 + pt1.second.gamma + ret_to2) * (long long)pk2.first
                                                   + pt2.second.retrieval + ret_from1 + pt1.second.gamma,
-                                                  ret_from1 + pt1.second.gamma};
+                                                  ret_from1 + pt1.second.gamma,
+                                                  {v, 10, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk2.first + 1;
                             int new_t= geometrically_discretize(new_DP_var.storage, epsilon);
                             int new_g = geometrically_discretize(new_DP_var.gamma,epsilon);
-                            update_DP_s(DP[v][new_k][new_g], new_t, new_DP_var, {v, 10}, pt1.second.change_type, pt2.second.change_type);
+                            update_DP_s(DP[v][new_k][new_g], new_t, new_DP_var);
                         }
                     }
                 }
@@ -581,23 +606,18 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_from2 + pt2.second.storage + pt1.second.storage,
                                                   pt2.second.retrieval + (ret_from2 + pt2.second.gamma + ret_to1) * (long long)pk1.first
                                                   + pt1.second.retrieval + ret_from2 + pt2.second.gamma,
-                                                  ret_from2 + pt2.second.gamma};
+                                                  ret_from2 + pt2.second.gamma,
+                                                  {v, 11, child1, &pt1.second.con, child2, &pt2.second.con}};
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk1.first + 1;
                             int new_t= geometrically_discretize(new_DP_var.storage, epsilon);
                             int new_g = geometrically_discretize(new_DP_var.gamma,epsilon);
-                            update_DP_s(DP[v][new_k][new_g], new_t, new_DP_var, {v, 11}, pt1.second.change_type, pt2.second.change_type);
+                            update_DP_s(DP[v][new_k][new_g], new_t, new_DP_var);
                         }
                     }
                 }
             }
-            DP.erase(child1);
-            DP.erase(child2);
-            OPT.erase(child1);
-            OPT.erase(child2);
-            OPT_fixing_k.erase(child1);
-            OPT_fixing_k.erase(child2);
         }///EndFor two children
 
         // calculate OPT
@@ -618,5 +638,5 @@ tuple<IntGraph, IntGraph, map<int, DP_type>> DP_bidirectional_s(const IntGraph &
             }
         }
     }
-    return {std::move(Arb), std::move(H), std::move(OPT[r])};
+    return {std::move(Arb), std::move(H), std::move(OPT), std::move(OPT_fixing_k), std::move(DP)};
 }
