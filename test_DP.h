@@ -20,6 +20,7 @@ void test_make_binary() {
 
 void recover_graph(IntGraph &ansG, const IntGraph &T, connection_type con) {
     const int &v = con.v, &child1 = con.child1, &child2 = con.child2;
+    cout << "recovering node " << v << endl;
     switch (con.val) {
         case 2:
             ansG.add_or_modify_edge(v, child1, T[v][child1], true);
@@ -56,9 +57,9 @@ void recover_graph(IntGraph &ansG, const IntGraph &T, connection_type con) {
     if (nodes.find(v) == nodes.end() or ansG.get_in_edges_of(v, true).empty()) {
         ansG.add_or_modify_edge(0, v, T[0][v], true);
     }
-    if (child1 > 0)
+    if (con.con1)
         recover_graph(ansG, T, *(con.con1));
-    if (child2 > 0)
+    if (con.con2)
         recover_graph(ansG, T, *(con.con2));
 }
 
@@ -97,7 +98,9 @@ void test_DP_on_git_graph(const string &name, double epsilon, bool use_storage=f
 
         IntGraph first_graph;
         recover_graph(first_graph, H, ans.begin()->second.con); //simulate recovering graph
-//        cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size();
+        cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size() << " "
+            << first_graph.is_valid_solution() << endl;
+        cout << first_graph.get_total_storage_cost() << " " << first_graph.get_total_retrieval_cost() << endl;
 
         output_file << ",,,time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
         for (const auto &p: ans) {
