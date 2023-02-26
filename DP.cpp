@@ -172,9 +172,6 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type, std::greater<>>>,
                     update_DP(DP[v][1][new_g], new_t, new_DP_var);
                 }
             }
-            OPT.erase(child);
-            DP.erase(child);
-            OPT_fixing_k.erase(child);
         }/// EndFor of onechild
 
             /// Two children
@@ -337,12 +334,6 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type, std::greater<>>>,
                     }
                 }
             }
-            DP.erase(child1);
-            DP.erase(child2);
-            OPT.erase(child1);
-            OPT.erase(child2);
-            OPT_fixing_k.erase(child1);
-            OPT_fixing_k.erase(child2);
         }///EndFor two children
 
         // calculate OPT
@@ -366,7 +357,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type, std::greater<>>>,
     return {std::move(Arb), std::move(H), std::move(OPT), std::move(DP)};
 }
 
-void update_DP_s(unordered_map<int, DP_type> &t_map, int t, DP_type &new_val) {
+void update_DP_s(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_val) {
     if (t_map.find(t) == t_map.end() or t_map[t].retrieval > new_val.retrieval) {
         t_map[t] = new_val;
     }
@@ -400,8 +391,8 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
     // count number of possible descendents
     for (const auto &v : nodes) {
         if (Arb.get_out_neighbors_of(v).empty()) {
-            int s = geometrically_discretize(H[0][v].storage, epsilon);
-            DP[v][1][0][s] = OPT[v][s] = OPT_fixing_k[v][0][s] = {H[0][v].storage, 0, 0, {v, 0, -1, nullptr, -1, nullptr}};//TODO: check intialization of map
+            int t = geometrically_discretize(H[0][v].storage, epsilon);
+            DP[v][1][-1][t] = OPT[v][t] = OPT_fixing_k[v][-1][t] = {H[0][v].storage, 0, 0, {v, 0, -1, nullptr, -1, nullptr}};
         }
     }
 
@@ -424,14 +415,14 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                 if (new_DP_var.storage > S)
                     continue;
                 int new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                update_DP_s(DP[v][1][0], new_t, new_DP_var);
+                update_DP_s(DP[v][1][-1], new_t, new_DP_var);
             }
 
             // 2. v to child
             for (const auto &pk : DP[child]) {
-                if (pk.second.find(0) == pk.second.end())
+                if (pk.second.find(-1) == pk.second.end())
                     continue;
-                for (const auto &pt : pk.second.at(0)) {
+                for (const auto &pt : pk.second.at(-1)) {
                     DP_type new_DP_var = {sto_to - mat + pt.second.storage + matv,
                                           pt.second.retrieval + ret_to * (long long)pk.first,
                                           0,
@@ -439,7 +430,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                     if (new_DP_var.storage > S)
                         continue;
                     int new_k = pk.first + 1, new_t= geometrically_discretize(new_DP_var.storage, epsilon);
-                    update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
+                    update_DP_s(DP[v][new_k][-1], new_t, new_DP_var);
                 }
             }
 
@@ -482,16 +473,16 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                                           {v, 4, child1, &pt1.second.con, child2, &pt2.second.con}};
                     if (new_DP_var.storage > S)
                         continue;
-                    update_DP_s(DP[v][1][0], geometrically_discretize(new_DP_var.storage, epsilon), new_DP_var);
+                    update_DP_s(DP[v][1][-1], geometrically_discretize(new_DP_var.storage, epsilon), new_DP_var);
                 }
             }
 
             // 5. Only edge is (v, child2)
             for (const auto &pt1 : OPT[child1]) {
                 for (const auto &pk2 : DP[child2]) {
-                    if (pk2.second.find(0) == pk2.second.end())
+                    if (pk2.second.find(-1) == pk2.second.end())
                         continue;
-                    for (const auto &pt2 : pk2.second.at(0)) {
+                    for (const auto &pt2 : pk2.second.at(-1)) {
                         DP_type new_DP_var = {sto_to2 - mat2 + pt2.second.storage + pt1.second.storage + matv,
                                               pt2.second.retrieval + ret_to2 * (long long)pk2.first + pt1.second.retrieval,
                                               0,
@@ -499,7 +490,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk2.first + 1, new_t = geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
+                        update_DP_s(DP[v][new_k][-1], new_t, new_DP_var);
                     }
                 }
             }
@@ -507,9 +498,9 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
             // 6. Only edge is (v, child1)
             for (const auto &pt2 : OPT[child2]) {
                 for (const auto &pk1 : DP[child1]) {
-                    if (pk1.second.find(0) == pk1.second.end())
+                    if (pk1.second.find(-1) == pk1.second.end())
                         continue;
-                    for (const auto &pt1 : pk1.second.at(0)) {
+                    for (const auto &pt1 : pk1.second.at(-1)) {
                         DP_type new_DP_var = {sto_to1 - mat1 + pt1.second.storage + pt2.second.storage + matv,
                                               pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval,
                                               0,
@@ -517,20 +508,20 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                         if (new_DP_var.storage > S)
                             continue;
                         int new_k = pk1.first + 1, new_t= geometrically_discretize(new_DP_var.storage, epsilon);
-                        update_DP_s(DP[v][new_k][0], new_t, new_DP_var);
+                        update_DP_s(DP[v][new_k][-1], new_t, new_DP_var);
                     }
                 }
             }
 
             // 7. Both (v, child1) and (v, child2)
             for (const auto &pk2 : DP[child2]) {
-                if (pk2.second.find(0) == pk2.second.end())
+                if (pk2.second.find(-1) == pk2.second.end())
                     continue;
-                for (const auto &pt2: pk2.second.at(0)) {
+                for (const auto &pt2: pk2.second.at(-1)) {
                     for (const auto &pk1: DP[child1]) {
-                        if (pk1.second.find(0) == pk1.second.end())
+                        if (pk1.second.find(-1) == pk1.second.end())
                             continue;
-                        for (const auto &pt1: pk1.second.at(0)) {
+                        for (const auto &pt1: pk1.second.at(-1)) {
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_to2 - mat2 + pt1.second.storage + pt2.second.storage + matv,
                                                   pt1.second.retrieval + ret_to1 * (long long)pk1.first + pt2.second.retrieval + ret_to2 * (long long)pk2.first,
                                                   0,
@@ -538,7 +529,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                             if (new_DP_var.storage > S)
                                 continue;
                             int new_k = pk1.first + pk2.first + 1, new_s= geometrically_discretize(new_DP_var.storage, epsilon);
-                            update_DP_s(DP[v][new_k][0], new_s, new_DP_var);
+                            update_DP_s(DP[v][new_k][-1], new_s, new_DP_var);
                         }
                     }
                 }
@@ -578,9 +569,9 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
 
             // 10. (child1, v) (v, child2)
             for (const auto &pk2 : DP[child2]) {
-                if (pk2.second.find(0) == pk2.second.end())
+                if (pk2.second.find(-1) == pk2.second.end())
                     continue;
-                for (const auto &pt2: pk2.second.at(0)) {
+                for (const auto &pt2: pk2.second.at(-1)) {
                     for (const auto &pg1: OPT_fixing_k[child1]) {
                         for (const auto &pt1: pg1.second) {
                             DP_type new_DP_var = {sto_to2 - mat2 + sto_from1 + pt1.second.storage + pt2.second.storage,
@@ -601,9 +592,9 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
 
             // 11. (child2, v) (v, child1)
             for (const auto &pk1 : DP[child1]) {
-                if (pk1.second.find(0) == pk1.second.end())
+                if (pk1.second.find(-1) == pk1.second.end())
                     continue;
-                for (const auto &pt1: pk1.second.at(0)) {
+                for (const auto &pt1: pk1.second.at(-1)) {
                     for (const auto &pg2: OPT_fixing_k[child2]) {
                         for (const auto &pt2: pg2.second) {
                             DP_type new_DP_var = {sto_to1 - mat1 + sto_from2 + pt2.second.storage + pt1.second.storage,

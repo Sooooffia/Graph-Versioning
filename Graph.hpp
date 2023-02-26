@@ -128,6 +128,7 @@ public:
      */
     void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
                                       unordered_map<int, long long>& retrieval_cost) const;
+    bool is_valid_solution() const;
 
     // Modifiers //
     /**

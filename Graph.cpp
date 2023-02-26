@@ -415,3 +415,11 @@ IntGraph Symmetric_MST_with_min_weight(const IntGraph &G, int r) {//TODO: this m
     cout << ans.size(false) << " " << ans.get_edges(false).size() << endl;
     return ans;
 }
+
+bool IntGraph::is_valid_solution() const {
+    for (const auto &v : nodes) {
+        if (inNeighbors.at(v).size() > 1)
+            return false;
+    }
+    return true;
+}
