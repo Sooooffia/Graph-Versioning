@@ -456,6 +456,9 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                     update_DP_s(DP[v][1][new_g], new_t, new_DP_var);
                 }
             }
+            OPT.erase(child);
+            OPT_fixing_k.erase(child);
+            DP.erase(child);
         }/// EndFor of onechild
 
         /// Two children
@@ -618,6 +621,12 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                     }
                 }
             }
+            OPT.erase(child1);
+            OPT.erase(child2);
+            OPT_fixing_k.erase(child1);
+            OPT_fixing_k.erase(child2);
+            DP.erase(child1);
+            DP.erase(child2);
         }///EndFor two children
 
         // calculate OPT

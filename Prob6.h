@@ -52,22 +52,24 @@ long long DP_BMR(const IntGraph &G, long long R) {
     for (const auto &v : nodes) {
         //paths and distances, for each source u with target v.
         vector<long long> dist(n+1, INT64_MAX); // dist[u] is the distance from u to v.
-        unordered_map<int, vector<int>> paths; // nodes traversed going from u to v, in BACKWARDS order. (namely, paths[u][0]=v for all u)
+        vector<int> first_node_on_path(n+1, -1); // nodes traversed going from u to v, in BACKWARDS order. (namely, paths[u][0]=v for all u)
         vector<int> pq = {v};
         vector<bool>visited(n+1, false);
         int ind = 0;
         dist[v] = 0;
         visited[v] = true;
-        paths[v].push_back(v);
 
         while (ind < pq.size()) {
             int u = pq[ind];
-            for (const auto &child : G.get_out_neighbors_of(u)) {
+            for (const auto &child : G.get_in_neighbors_of(u, false)) {
                 if (not visited[child]) {
                     visited[child] = true;
                     dist[child] = dist[u] + G[child][u].retrieval;
-                    paths[child] = paths[u]; // copy?
-                    paths[child].push_back(child);
+                    if (u != v) {
+                        first_node_on_path[child] = first_node_on_path[u];
+                    } else {
+                        first_node_on_path[child] = child;
+                    }
                     pq.push_back(child);
                 }
             }
@@ -80,7 +82,7 @@ long long DP_BMR(const IntGraph &G, long long R) {
                 continue;
             long long sum = 0;
             for (const auto &w : H.get_out_neighbors_of(v)) {
-                if (u != v and paths[u][1] == w) // if w is in the path from u to v
+                if (u != v and first_node_on_path[u] == w) // if w is in the path from u to v
                     sum += DP[w][u];
                 else
                     sum += std::min(DP[w][u], OPT[w]);
@@ -88,10 +90,10 @@ long long DP_BMR(const IntGraph &G, long long R) {
             if (u == v)
                 sum += G[0][v].storage;
             else
-                sum += G[paths[u][1]][v].storage;
+                sum += G[first_node_on_path[u]][v].storage;
 
             DP[v][u] = sum;
-            if (v == 1 or v == u or paths[u][1] != H.get_in_neighbors_of(v,false)[0])
+            if (v == 1 or v == u or first_node_on_path[u] != H.get_in_neighbors_of(v,false)[0])
                 OPT[v] = std::min(OPT[v], sum);
         }
     }

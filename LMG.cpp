@@ -13,10 +13,10 @@ IntGraph LMG(const IntGraph& G, int S) {
     }
 
     /// Initializing dependency, retrieval, and active nodes
-    unordered_map<int, int> dependency_count;
+    unordered_map<int, unordered_set<int>> dependency_set;
     unordered_map<int, long long> retrieval_cost;
 
-    H.get_dependency_count_and_retrieval_cost(dependency_count, retrieval_cost);
+    H.get_dependency_list_and_retrieval_cost(dependency_set, retrieval_cost);
 
 
     unordered_set<int> active_nodes; // The set of nodes that are not materialized, and that our budget allows for materialization.
@@ -38,7 +38,7 @@ IntGraph LMG(const IntGraph& G, int S) {
             if (G[0][v].storage <= G[pred][v].storage) {
                 rho[v] = std::numeric_limits<double>::infinity();
             } else {
-                rho[v] = double(dependency_count[v]) * retrieval_cost[v] / (G[0][v].storage - G[pred][v].storage);
+                rho[v] = double(dependency_set[v].size()) * retrieval_cost[v] / (G[0][v].storage - G[pred][v].storage);
             }
         }
         auto iter = std::max_element(rho.begin(), rho.end(),
@@ -50,24 +50,18 @@ IntGraph LMG(const IntGraph& G, int S) {
             break;
 
         // 2. Modify dependency
-        int dependency_reduction = dependency_count[candidate], retrieval_reduction = retrieval_cost[candidate];
+        const auto & dependency_reduction = dependency_set[candidate];
+        auto retrieval_reduction = retrieval_cost[candidate];
         int cur = H.get_in_neighbors_of(candidate, true)[0];
         while (cur != 0) {
-            dependency_count[cur] -= dependency_reduction;
+            for (const auto &node : dependency_reduction)
+                dependency_set[cur].erase(node);
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
 
         // 3. Modify retrieval
-        vector<int> pq{candidate};
-        size_t ind = 0;
-        while (ind != pq.size()) {
-            retrieval_cost[pq[ind]] -= retrieval_reduction;
-            auto children = H.get_out_neighbors_of(pq[ind]);
-            pq.insert(pq.end(), children.begin(), children.end());
-            ind++;
-        }
-        for (auto v : pq) {
-            retrieval_cost[v] -= retrieval_reduction;
+        for (auto child : dependency_reduction) {
+            retrieval_cost[child] -= retrieval_reduction;
         }
 
         // 4. Update the graph and active nodes
@@ -146,7 +140,7 @@ IntGraph LMG_all(const IntGraph& G, int S) {
 
         int cur = H.get_in_neighbors_of(v, true)[0];
         while (cur != 0) {
-            for (auto node : dependency_reduction)
+            for (const auto &node : dependency_reduction)
                 dependency_set[cur].erase(node);
             cur = H.get_in_neighbors_of(cur, true)[0];
         }
