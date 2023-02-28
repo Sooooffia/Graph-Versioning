@@ -85,22 +85,27 @@ void test_DP_on_git_graph(const string &name, double epsilon, bool use_storage=f
     for (const auto &v : G.get_nodes(false)) {
         bidirectional_T.add_or_modify_edge(0, v, G[0][v], true);
     }
+
     cout << bidirectional_T.size(false) << " " << bidirectional_T.get_edges(false).size() << endl;
 
     auto M = MST(bidirectional_T);
     long long S_min = M.get_total_storage_cost(), R_of_MST = M.get_total_retrieval_cost();
+    cout << "S_min = " << S_min << ", R_max=" << R_of_MST << endl;
 
     if (use_storage) {
         auto [Arbb, H, OPT, OPT_k, DP] = DP_bidirectional_s(bidirectional_T, r, epsilon, S_min * 2, R_of_MST);
-        auto ans = OPT[r];
-        auto end_DP = high_resolution_clock::now();
+        auto ans = OPT.at(r);
+
         cout << "DP finished" << endl;
 
         IntGraph first_graph;
+        cout << ans.size() << endl;
+        cout << DP.at(r).size() << endl;
         recover_graph(first_graph, H, ans.begin()->second.con); //simulate recovering graph
         cout << first_graph.get_edges(true).size() << " " << first_graph.get_nodes(false).size() << " "
             << first_graph.is_valid_solution() << endl;
         cout << first_graph.get_total_storage_cost() << " " << first_graph.get_total_retrieval_cost() << endl;
+        auto end_DP = high_resolution_clock::now();
 
         output_file << ",,,time used: " << duration_cast<milliseconds>(end_DP - start_DP).count() << endl;
         for (const auto &p: ans) {

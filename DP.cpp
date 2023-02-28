@@ -376,12 +376,13 @@ void update_OPT_s(unordered_map<int, DP_type> &t_map, int t, const DP_type &new_
 tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>, unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>>>
     DP_bidirectional_s(const IntGraph &G, int r, double epsilon, long long S, long long R_of_MST) {
     auto [H, Arb] = make_binary_bidirectional(G, r);
+    if (not Arb.is_arborescence(r))
+        throw logic_error("Arb not an arborescence");
     cout << H.size(false) << " " << H.get_edges(false).size() << endl;
 
     // 1. Calculating parameters
     auto nodes = Arb.get_nodes_in_bfs_order(r);
     std::reverse(nodes.begin(), nodes.end());
-    auto edges = H.get_edges(false);
 
     // 2. Base cases
     unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, DP_type>>>> DP; ///< [v][k][gamma][t]
@@ -390,9 +391,10 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
 
     // count number of possible descendents
     for (const auto &v : nodes) {
-        if (Arb.get_out_neighbors_of(v).empty()) {
+        if (Arb.get_out_edges_of(v).empty()) {
             int t = geometrically_discretize(H[0][v].storage, epsilon);
             DP[v][1][-1][t] = OPT[v][t] = OPT_fixing_k[v][-1][t] = {H[0][v].storage, 0, 0, {v, 0, -1, nullptr, -1, nullptr}};
+            // Gamma=-1 means v is materialized.
         }
     }
 
@@ -405,6 +407,8 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
             long long sto_to = H[v][child].storage, sto_from = H[child][v].storage; /// to and from CHILD
             long long ret_to = H[v][child].retrieval, ret_from = H[child][v].retrieval;
             long long matv = H[0][v].storage, mat = H[0][child].storage;
+            cout << "node " << v << " has " << DP[child].size() << " choices of k_child" << endl;
+
 
             // 1. Independent.
             for (const auto &pt : OPT[child]) {
@@ -447,9 +451,9 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                     update_DP_s(DP[v][1][new_g], new_t, new_DP_var);
                 }
             }
-            OPT.erase(child);
-            OPT_fixing_k.erase(child);
-            DP.erase(child);
+//            OPT.erase(child);
+//            OPT_fixing_k.erase(child);
+//            DP.erase(child);
         }/// EndFor of onechild
 
         /// Two children
@@ -460,7 +464,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
             long long ret_to1 = H[v][child1].retrieval, ret_from1 = H[child1][v].retrieval;
             long long ret_to2 = H[v][child2].retrieval, ret_from2 = H[child2][v].retrieval;
             long long matv = H[0][v].storage, mat1 = H[0][child1].storage, mat2 = H[0][child2].storage;
-            cout << "node " << v << " has " << DP[child1].size() << " choices of k1, " << DP[child2].size() << " choices of k2.\n";
+            cout << "node " << v << " has " << DP[child1].size() << " choices of k1, " << DP[child2].size() << " choices of k2." << endl;
             cout << OPT[child1].size() << " choices of t1." << endl;
             cout << OPT[child2].size() << " choices of t2." << endl;
 
@@ -612,13 +616,21 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                     }
                 }
             }
-            OPT.erase(child1);
-            OPT.erase(child2);
-            OPT_fixing_k.erase(child1);
-            OPT_fixing_k.erase(child2);
-            DP.erase(child1);
-            DP.erase(child2);
-        }///EndFor two children
+//            OPT.erase(child1);
+//            OPT.erase(child2);
+//            OPT_fixing_k.erase(child1);
+//            OPT_fixing_k.erase(child2);
+//            DP.erase(child1);
+//            DP.erase(child2);
+        } else if (out_edges.size() > 2) {///EndFor two children
+            cout << "Node " << v << " has children " << Arb.get_out_neighbors_of(v);
+            throw logic_error("More than two children");
+        }
+
+        if (DP[v].empty()) {
+            cout << v << endl;
+            throw logic_error("no solution found on v");
+        }
 
         // calculate OPT
         for (const auto &pk : DP[v]) {
@@ -628,6 +640,7 @@ tuple<IntGraph, IntGraph, unordered_map<int, map<int, DP_type>>, unordered_map<i
                 }
             }
         }
+
 
         // calculate OPT_fixing_k
         for (const auto &pk : DP[v]) {

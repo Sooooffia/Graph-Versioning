@@ -5,9 +5,9 @@ using std::pair;
 using std::cout;
 
 
-IntGraph LMG(const IntGraph& G, int S) {
+IntGraph LMG(const IntGraph& G, long long S) {
     IntGraph H = MST(G); // The current graph that LMG works on. Initially it's the MST.
-    int storage_surplus = S - H.get_total_storage_cost();
+    long long storage_surplus = S - H.get_total_storage_cost();
     if (storage_surplus < 0) {
         throw invalid_argument("LMG: storage budget infeasible.");
     }
@@ -29,7 +29,7 @@ IntGraph LMG(const IntGraph& G, int S) {
 
     /// Iteratively materialize nodes while modifying dependency and retrieval accordingly.
     while (!active_nodes.empty()) {
-        cout << active_nodes.size() << " nodes left" << endl;
+//        cout << active_nodes.size() << " nodes left" << endl;
         // 1. Calculate rho for all active nodes and find maximum
         unordered_map<int, double> rho; // For each v, rho[v] is the value over cost of materializing v.
         for (auto v : active_nodes) {
@@ -80,9 +80,9 @@ IntGraph LMG(const IntGraph& G, int S) {
     }
     return H;
 }
-IntGraph LMG_all(const IntGraph& G, int S) {
+IntGraph LMG_all(const IntGraph& G, long long S) {
     IntGraph H = MST(G); // The current graph that LMG works on. Initially it's the MST.
-    int storage_surplus = S - H.get_total_storage_cost();
+    long long storage_surplus = S - H.get_total_storage_cost();
     if (storage_surplus < 0) {
         throw invalid_argument("LMG: storage budget infeasible.");
     }

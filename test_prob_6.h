@@ -30,7 +30,7 @@ void test_MP_vs_DP_on_git_graph(const string& name, int base_R = 1000) {
         bidirectional_T.add_or_modify_edge(0, v, G[0][v], true);
     }
 
-    output_file << "max retrieval constraint,MP solution,MP solution,MP time,DP time,DP solution" << endl;
+    output_file << "max retrieval constraint,MP,MP solution,DP-BMR,MP time,DP time" << endl;
     for (int theta = 0; theta < 20; theta ++) {
         long long R = base_R * theta;
         cout << "Testing R = " << R << endl;
@@ -45,8 +45,8 @@ void test_MP_vs_DP_on_git_graph(const string& name, int base_R = 1000) {
 
         auto MP_sol_value = sol_MP.get_total_storage_cost();
         output_file << R << "," << MP_sol_value << "," << MP_sol_value << ",";
-        output_file << duration_cast<milliseconds>(end_MP-start_MP).count() << "," << duration_cast<milliseconds>(end_DP-start_DP).count();
-        output_file << "," << sol_DP << endl;
+        output_file << sol_DP << "," << duration_cast<milliseconds>(end_MP-start_MP).count();
+        output_file << "," << duration_cast<milliseconds>(end_DP-start_DP).count() << endl;
     }
     graph_file.close();
     output_file.close();

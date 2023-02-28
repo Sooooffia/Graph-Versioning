@@ -29,8 +29,8 @@ using std::priority_queue;
 using std::string;
 
 struct edge_variables{
-    int storage = 0;
-    int retrieval = 0;
+    long storage = 0;
+    long retrieval = 0;
 };
 
 inline bool operator==(const edge_variables& a, const edge_variables& b) {
@@ -129,6 +129,7 @@ public:
     void get_dependency_list_and_retrieval_cost(unordered_map<int, unordered_set<int>>& dependency_list,
                                       unordered_map<int, long long>& retrieval_cost) const;
     bool is_valid_solution() const;
+    bool is_arborescence(int r) const;
 
     // Modifiers //
     /**

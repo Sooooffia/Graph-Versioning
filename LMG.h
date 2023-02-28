@@ -11,13 +11,13 @@
  * @param S: int, Storage budget
  * @returns H: IntGraph.
  */
-IntGraph LMG(const IntGraph& G, int S);
+IntGraph LMG(const IntGraph& G, long long S);
 
 /**
  * @param G: IntGraph, Version Graph
  * @param S: int, Storage budget
  * @returns H: IntGraph.
  */
-IntGraph LMG_all(const IntGraph& G, int S);
+IntGraph LMG_all(const IntGraph& G, long long S);
 
 #endif //GRAPH_VERSIONING_LMG_H

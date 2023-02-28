@@ -300,8 +300,8 @@ void IntGraph::get_dependency_list_and_retrieval_cost(unordered_map<int, unorder
 long long IntGraph::get_total_storage_cost() const {
     long long ans = 0;
     auto edges = get_edges(true);
-    for (auto e : edges) {
-        ans += get<2>(e).storage;
+    for (const auto &[u,v,w] : edges) {
+        ans += w.storage;
     }
     return ans;
 }
@@ -316,12 +316,11 @@ long long IntGraph::get_total_retrieval_cost() const {
     return ans;
 }
 vector<int> IntGraph::get_nodes_in_bfs_order(int r) const {//TODO: not tested
-    vector<int> pq{r};
-    bool visited[this->size(true)]; // initially false
-    memset(visited, 0, sizeof(visited));
+    vector<int> pq = {r};
+    vector<bool> visited(nodes.size(), false);
     int ind = 0;
     while (ind < pq.size()) {
-        for (int child : get_out_neighbors_of(pq[ind]))
+        for (const auto &child : get_out_neighbors_of(pq[ind]))
             if (not visited[child]) {
                 pq.push_back(child);
                 visited[child] = true;
@@ -356,14 +355,15 @@ IntGraph MST(const IntGraph& G) {
 
     /// Calculating MST the fast way
     arbok::Gabow alg(G.size(true), m);
-    for (const auto& e:edges){
-        int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
-        alg.create_edge(u,v,w);
+    for (const auto& [u,v,w]:edges){// MST uses storage cost as weight
+        alg.create_edge(u,v,w.storage);
     }
     alg.run(0);
     auto edge_indices = alg.reconstruct(0);
+
     vector<tuple<int, int, edge_variables>> MST_edges;
-    for (auto ind : edge_indices) {
+    MST_edges.reserve(edge_indices.size());
+    for (const auto& ind : edge_indices) {
         MST_edges.push_back(edges[ind]);
     }
     return IntGraph(MST_edges);
@@ -375,13 +375,14 @@ IntGraph MST_with_designated_root(const IntGraph &G, int r) {//TODO: not tested
 
     /// Calculating MST the fast way
     arbok::Gabow alg(G.size(false), m);
-    for (const auto& e : edges){
-        int u = get<0>(e), v = get<1>(e), w = get<2>(e).storage; // MST uses storage cost as weight
-        alg.create_edge(u-1, v-1, w);
+    for (const auto& [u,v,w] : edges){
+        alg.create_edge(u-1, v-1, w.storage+w.retrieval);
     }
     alg.run(r-1);
     auto edge_indices = alg.reconstruct(r-1);
+
     vector<tuple<int, int, edge_variables>> MST_edges;
+    MST_edges.reserve(edge_indices.size());
     for (auto ind : edge_indices) {
         MST_edges.push_back(edges[ind]);
     }
@@ -418,8 +419,24 @@ IntGraph Symmetric_MST_with_min_weight(const IntGraph &G, int r) {//TODO: this m
 
 bool IntGraph::is_valid_solution() const {
     for (const auto &v : nodes) {
-        if (inNeighbors.at(v).size() > 1)
+        if (inNeighbors.at(v).size() != 1)
             return false;
     }
+    return true;
+}
+
+bool IntGraph::is_arborescence(int r) const {
+    if (r == 0) {
+        for (const auto &v : nodes) {
+            if (v != 0 and inNeighbors.at(v).size() != 1)
+                return false;
+        }
+    } else {
+        for (const auto &v: nodes) {
+            if (v != 0 and inNeighbors.at(v).size() != 2 and v != r)
+                return false;
+        }
+    }
+
     return true;
 }
