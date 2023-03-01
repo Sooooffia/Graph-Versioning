@@ -60,7 +60,7 @@ IntGraph LMG(const IntGraph& G, long long S) {
         }
 
         // 3. Modify retrieval
-        for (auto child : dependency_reduction) {
+        for (const auto &child : dependency_reduction) {
             retrieval_cost[child] -= retrieval_reduction;
         }
 
@@ -133,7 +133,7 @@ IntGraph LMG_all(const IntGraph& G, long long S) {
 
         // 2. Modify dependency
         const auto &dependency_reduction = dependency_set[v];
-        int retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
+        long long retrieval_reduction = retrieval_cost[v] - (retrieval_cost[u] + w.retrieval);
         if (retrieval_reduction <= 0) { // No possible improvements
             break;
         }
@@ -151,7 +151,7 @@ IntGraph LMG_all(const IntGraph& G, long long S) {
         }
 
         // 3. Modify retrieval
-        for (auto child : dependency_reduction) {
+        for (const auto &child : dependency_reduction) {
             retrieval_cost[child] -= retrieval_reduction;
         }
 

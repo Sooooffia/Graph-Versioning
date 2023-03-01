@@ -62,7 +62,7 @@ int main() {
 //    cout << Modified_Prim(G, 20).get_total_storage_cost() << endl;
 //    cout << DP_BMR(G, 20) << endl;
 
-//    write_graph_to_PACE("datasharing");
+    write_graph_to_PACE("datasharing");
 //    write_graph_to_PACE("styleguide");
 //    write_graph_to_PACE("LeetCodeAnimation");
 //    write_graph_to_PACE("gitignore");
