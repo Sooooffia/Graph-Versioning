@@ -18,7 +18,7 @@ To reproduce the experiments with CLion (recommended): Open the project using CL
 
 To reproduce the experiments using command line (to be tested):
 - run `cmake -Bcmake-build-debug -H. ` in the directory to reload subdirectory. 
-- run `cmake --build cmake-build-debug --target` to build the project. 
+- run `cmake --build cmake-build-debug --target Graph-Versioning` to build the project. 
 - the excutable can be found in the ./cmake-build-eebug subdirectory. 
 
 Note: modify main.cpp in order to run different experiments. 
