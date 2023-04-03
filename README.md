@@ -10,7 +10,6 @@ Anxin (Bob) Guo, Jingwei (Sofia) Li, Pattara Sukprasert, Samir Khuller, Amol Des
 We need the following packages:
 - Gurobi
 - CMake
-- Make
 
 ## Instructions
 
