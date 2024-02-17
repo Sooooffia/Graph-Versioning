@@ -1,10 +1,10 @@
 # Graph-Versioning
 
-This is a sourcecode for experiments related to graph versioning. Which is supplement to a paper titled **To Store or Not to Store: a graph theoretical approach for
-Dataset Versioning**.
+This is a sourcecode for experiments related to dataset versioning, which is supplement to a paper titled **To Store or Not to Store: a graph theoretical approach for
+Dataset Versioning**. 
 
 ## Authors
-Anxin (Bob) Guo, Jingwei (Sofia) Li, Pattara Sukprasert, Samir Khuller, Amol Deshpande, Koyel Mukherjee.
+Anxin Guo, Jingwei Li, Pattara Sukprasert, Samir Khuller, Amol Deshpande, Koyel Mukherjee.
 
 ## Prerequisites
 We need the following packages:
